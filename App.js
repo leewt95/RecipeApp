@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import WelcomeScreen from './components/WelcomeScreen';
-import HomeScreen from './components/HomeScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
+import HomeScreen from './screens/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen';
