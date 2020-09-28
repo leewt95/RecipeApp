@@ -1,20 +1,27 @@
-import React from 'react';
-import { Button, View, Text } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useLayoutEffect } from 'react';
+import { Button, Text, Image, Pressable } from 'react-native';
+import { Content, Container, Icon } from 'native-base';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
-
   const { recipe } = route.params;
-  
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <Icon type="FontAwesome5" name="save" />,
+    });
+  }, [navigation]);
+
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <ScrollView>
+    <Container>
+      <Button title="Save recipe" />
+      <Content padder>
         {Object.values(recipe).map((e, i) => {
-          return <Text key={i}>{e}</Text>;
+          if (e !== null && e !== '') {
+            return <Text key={i}>{e}</Text>;
+          }
         })}
-      </ScrollView>
-      <Button title="Back to Home" onPress={() => navigation.goBack()} />
-    </View>
+      </Content>
+    </Container>
   );
 };
 
