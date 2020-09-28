@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import WelcomeScreen from './screens/WelcomeScreen';
+import RecipeDetailsScreen from './screens/RecipeDetailsScreen';
 import HomeScreen from './screens/HomeScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen';
 
 const Stack = createStackNavigator();
@@ -14,7 +14,10 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Home"
+      screenOptions={{
+        ...TransitionPresets.SlideFromRightIOS 
+      }}>
         <Stack.Screen
           name="Home"
           component={HomeScreen}
@@ -23,7 +26,11 @@ const App = () => {
             headerTitleAlign: 'center',
           }}
         />
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen
+          name="RecipeDetails"
+          component={RecipeDetailsScreen}
+          options={({ route }) => ({ title: route.params.recipe.strMeal })}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

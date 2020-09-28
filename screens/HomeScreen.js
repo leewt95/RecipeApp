@@ -29,11 +29,12 @@ const HomeScreen = ({ navigation }) => {
             cardBody
             button
             bordered
-            onPress={() => navigation.navigate('Welcome')}>
+            onPress={() =>
+              navigation.navigate('RecipeDetails', { recipe: recipe })
+            }>
             <Image
               source={{ uri: recipe.strMealThumb }}
               style={{ width: null, height: 200, flex: 1 }}
-              onPress={() => navigation.navigate('Welcome')}
             />
           </CardItem>
           <CardItem footer>
