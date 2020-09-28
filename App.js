@@ -18,7 +18,10 @@ const App = () => {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: 'Home' }}
+          options={{
+            title: 'RecipeApp React Native',
+            headerTitleAlign: 'center',
+          }}
         />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
       </Stack.Navigator>
