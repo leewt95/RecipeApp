@@ -22,22 +22,23 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <Container>
-      <Content style={{ margin: 10 }}>
+      <Content padder>
         <Text>Recipe of the day</Text>
         <Card>
           <CardItem
             cardBody
             button
             bordered
+            style={{
+              flexDirection: 'column',
+            }}
             onPress={() =>
               navigation.navigate('RecipeDetails', { recipe: recipe })
             }>
             <Image
               source={{ uri: recipe.strMealThumb }}
-              style={{ width: null, height: 200, flex: 1 }}
+              style={{ width: '100%', height: 200 }}
             />
-          </CardItem>
-          <CardItem footer>
             <Text>{recipe.strMeal}</Text>
           </CardItem>
         </Card>
