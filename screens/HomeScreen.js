@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, Text, Image } from 'react-native';
 import { Card, CardItem, Container, Content } from 'native-base';
 import TheMealDb from '../api/TheMealDb';
+import Realm from 'realm';
+import { RecipeSchema } from '../database/recipeSchemas';
 
 const HomeScreen = ({ navigation }) => {
   const [recipe, setRecipe] = useState([]);
@@ -13,6 +15,22 @@ const HomeScreen = ({ navigation }) => {
       })
       .catch((e) => {
         alert(e);
+      });
+  };
+
+  const clearDatabase = async () => {
+    await Realm.open({
+      schema: [RecipeSchema],
+    })
+      .then((realm) => {
+        realm.write(() => {
+          realm.delete(realm.objects('Recipe'));
+        });
+        realm.close();
+        console.log('Database cleared!');
+      })
+      .catch((e) => {
+        console.log(e);
       });
   };
 
@@ -44,6 +62,7 @@ const HomeScreen = ({ navigation }) => {
         </Card>
         <Text>Powered by TheMealDB</Text>
         <Button title="Get new recipe" onPress={() => getRecipeOfTheDay()} />
+        <Button title="Clear database" onPress={() => clearDatabase()} />
       </Content>
     </Container>
   );

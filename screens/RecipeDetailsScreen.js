@@ -1,9 +1,35 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { Text } from 'react-native';
 import { Content, Container, Icon, Button } from 'native-base';
+import Realm from 'realm';
+import { RecipeSchema } from '../database/recipeSchemas';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
+  const [saved, savedToDb] = useState(false);
   const { recipe } = route.params;
+
+  const AddRecipeToDb = async () => {
+    await Realm.open({
+      schema: [RecipeSchema],
+    })
+      .then((realm) => {
+        realm.write(() => {
+          realm.create('Recipe', {
+            recipeName: recipe.strMeal,
+            recipeCategory: recipe.strCategory,
+          });
+        });
+        {
+          for (let p of realm.objects('Recipe')) {
+            console.log(p);
+          }
+        }
+        realm.close();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -15,12 +41,43 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
             marginEnd: 3,
             elevation: 0,
             backgroundColor: 'transparent',
+          }}
+          onPress={() => {
+            if (!saved) {
+              savedToDb(true);
+              AddRecipeToDb();
+            }
           }}>
-          <Icon type="FontAwesome5" name="save" style={{ color: 'black' }} />
+          <Icon
+            type="FontAwesome5"
+            name="save"
+            style={saved ? { color: 'gray' } : { color: 'black' }}
+          />
         </Button>
       ),
     });
-  }, [navigation]);
+  }, [navigation, saved]);
+
+  useEffect(() => {
+    Realm.open({
+      schema: [RecipeSchema],
+    })
+      .then((realm) => {
+        {
+          for (let p of realm.objects('Recipe')) {
+            if (p.recipeName === recipe.strMeal) {
+              console.log(`${recipe.strMeal} already exist!`);
+              savedToDb(true);
+              break;
+            }
+          }
+        }
+        realm.close();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
 
   return (
     <Container>
