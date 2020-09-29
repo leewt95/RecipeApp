@@ -1,19 +1,29 @@
 import React, { useLayoutEffect } from 'react';
-import { Button, Text, Image, Pressable } from 'react-native';
-import { Content, Container, Icon } from 'native-base';
+import { Text } from 'react-native';
+import { Content, Container, Icon, Button } from 'native-base';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
   const { recipe } = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Icon type="FontAwesome5" name="save" />,
+      headerRight: () => (
+        <Button
+          rounded
+          androidRippleColor="gray"
+          style={{
+            marginEnd: 3,
+            elevation: 0,
+            backgroundColor: 'transparent',
+          }}>
+          <Icon type="FontAwesome5" name="save" style={{ color: 'black' }} />
+        </Button>
+      ),
     });
   }, [navigation]);
 
   return (
     <Container>
-      <Button title="Save recipe" />
       <Content padder>
         {Object.values(recipe).map((e, i) => {
           if (e !== null && e !== '') {
