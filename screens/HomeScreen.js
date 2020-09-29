@@ -63,6 +63,7 @@ const HomeScreen = ({ navigation }) => {
         <Text>Powered by TheMealDB</Text>
         <Button title="Get new recipe" onPress={() => getRecipeOfTheDay()} />
         <Button title="Clear database" onPress={() => clearDatabase()} />
+        <Button title="Add custom recipe" onPress={() => navigation.navigate('AddNewRecipe')} />
       </Content>
     </Container>
   );
