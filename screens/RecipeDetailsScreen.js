@@ -14,10 +14,22 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
     })
       .then((realm) => {
         realm.write(() => {
-          realm.create('Recipe', {
-            recipeName: recipe.strMeal,
-            recipeCategory: recipe.strCategory,
+          let recipeIngredients = realm.create('Recipe', {
+            idMeal: recipe.idMeal,
+            strMeal: recipe.strMeal,
+            strCategory: recipe.strCategory,
+            strInstructions: recipe.strInstructions,
+            strMealThumb: recipe.strMealThumb,
+            strYoutube: recipe.strYoutube,
+            strSource: recipe.strSource,
           });
+          
+          for (let p = 0; p < 20; p++) {
+            if (recipe['strIngredient' + `${p + 1}`] !== '') {
+              recipeIngredients[`strIngredient${p+1}`] = recipe[`strIngredient${p+1}`]
+              recipeIngredients[`strMeasure${p+1}`] = recipe[`strMeasure${p+1}`]
+            }
+          }
         });
         {
           for (let p of realm.objects('Recipe')) {

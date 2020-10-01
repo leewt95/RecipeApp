@@ -18,6 +18,23 @@ const HomeScreen = ({ navigation }) => {
       });
   };
 
+  const viewDatabase = async () => {
+    await Realm.open({
+      schema: [RecipeSchema],
+    })
+      .then((realm) => {
+        {
+          for (let p of realm.objects('Recipe')) {
+              console.log(p);
+          }
+        }
+        realm.close();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
   const clearDatabase = async () => {
     await Realm.open({
       schema: [RecipeSchema],
@@ -62,6 +79,7 @@ const HomeScreen = ({ navigation }) => {
         </Card>
         <Text>Powered by TheMealDB</Text>
         <Button title="Get new recipe" onPress={() => getRecipeOfTheDay()} />
+        <Button title="View database" onPress={() => viewDatabase()} />
         <Button title="Clear database" onPress={() => clearDatabase()} />
         <Button title="Add custom recipe" onPress={() => navigation.navigate('AddNewRecipe')} />
       </Content>
