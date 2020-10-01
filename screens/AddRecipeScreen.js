@@ -15,11 +15,13 @@ import {
 import Realm from 'realm';
 import { RecipeSchema } from '../database/recipeSchemas';
 import ImagePicker from 'react-native-image-picker';
+import RecipeCategories from '../xml/RecipeCategories.js';
 
 const AddRecipeScreen = ({ navigation }) => {
   const [imageSource, setImageSource] = useState(null);
   const [selectedPickerValue, changePickerValue] = useState('');
   const [inputForms, addForms] = useState([]);
+  const [recipeCategory, setRecipeCategory] = useState([]);
 
   const imagePickerOptions = {
     title: 'Select Camera / Gallery',
@@ -57,13 +59,25 @@ const AddRecipeScreen = ({ navigation }) => {
     });
   };
 
-  const pickerOnValueChange = (value) => {
-    changePickerValue(value);
-  };
-
   const addNewIngredient = () => {
     addForms([...inputForms, { meta_name: 'value', meta_value: 'value' }]);
   };
+
+  const readXmlFile = () => {
+    var strXml = require('react-native-xml2js').parseString;
+    var xml = RecipeCategories;
+    try {
+      strXml(xml, (err, result) => {
+        setRecipeCategory(result.RecipeCategories.Category);
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    readXmlFile();
+  }, []);
 
   return (
     <Container>
@@ -105,14 +119,13 @@ const AddRecipeScreen = ({ navigation }) => {
             <Picker
               mode="dropdown"
               selectedValue={selectedPickerValue}
-              onValueChange={(value) => pickerOnValueChange(value)}>
-              <Picker.Item label="Seafood" value="Seafood" />
-              <Picker.Item label="Meat" value="Meat" />
-              <Picker.Item label="Desert" value="Desert" />
+              onValueChange={(value) => changePickerValue(value)}>
+              {recipeCategory.map((e, i) => {
+                return <Picker.Item label={e} value={e} />;
+              })}
             </Picker>
           </Item>
         </Form>
-
         <Button title="Generate a button" onPress={() => addNewIngredient()} />
         {inputForms.map((customInput, key) => {
           return (
