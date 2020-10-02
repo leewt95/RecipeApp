@@ -121,7 +121,7 @@ const AddRecipeScreen = ({ navigation }) => {
               selectedValue={selectedPickerValue}
               onValueChange={(value) => changePickerValue(value)}>
               {recipeCategory.map((e, i) => {
-                return <Picker.Item label={e} value={e} />;
+                return <Picker.Item key={i} label={e} value={e} />;
               })}
             </Picker>
           </Item>
