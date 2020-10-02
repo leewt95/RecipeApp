@@ -6,7 +6,7 @@ import { RecipeSchema } from '../database/recipeSchemas';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
   const [saved, savedToDb] = useState(false);
-  const { recipe } = route.params;
+  const { recipe, toggleSave } = route.params;
 
   const AddRecipeToDb = async () => {
     await Realm.open({
@@ -23,11 +23,13 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
             strYoutube: recipe.strYoutube,
             strSource: recipe.strSource,
           });
-          
+
           for (let p = 0; p < 20; p++) {
             if (recipe['strIngredient' + `${p + 1}`] !== '') {
-              recipeIngredients[`strIngredient${p+1}`] = recipe[`strIngredient${p+1}`]
-              recipeIngredients[`strMeasure${p+1}`] = recipe[`strMeasure${p+1}`]
+              recipeIngredients[`strIngredient${p + 1}`] =
+                recipe[`strIngredient${p + 1}`];
+              recipeIngredients[`strMeasure${p + 1}`] =
+                recipe[`strMeasure${p + 1}`];
             }
           }
         });
@@ -44,51 +46,55 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
   };
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          rounded
-          androidRippleColor="gray"
-          style={{
-            marginEnd: 3,
-            elevation: 0,
-            backgroundColor: 'transparent',
-          }}
-          onPress={() => {
-            if (!saved) {
-              savedToDb(true);
-              AddRecipeToDb();
-            }
-          }}>
-          <Icon
-            type="FontAwesome5"
-            name="save"
-            style={saved ? { color: 'gray' } : { color: 'black' }}
-          />
-        </Button>
-      ),
-    });
+    if (toggleSave) {
+      navigation.setOptions({
+        headerRight: () => (
+          <Button
+            rounded
+            androidRippleColor="gray"
+            style={{
+              marginEnd: 3,
+              elevation: 0,
+              backgroundColor: 'transparent',
+            }}
+            onPress={() => {
+              if (!saved) {
+                savedToDb(true);
+                AddRecipeToDb();
+              }
+            }}>
+            <Icon
+              type="FontAwesome5"
+              name="save"
+              style={saved ? { color: 'lightgray' } : { color: 'black' }}
+            />
+          </Button>
+        ),
+      });
+    }
   }, [navigation, saved]);
 
   useEffect(() => {
-    Realm.open({
-      schema: [RecipeSchema],
-    })
-      .then((realm) => {
-        {
-          for (let p of realm.objects('Recipe')) {
-            if (p.recipeName === recipe.strMeal) {
-              console.log(`${recipe.strMeal} already exist!`);
-              savedToDb(true);
-              break;
+    if (toggleSave) {
+      Realm.open({
+        schema: [RecipeSchema],
+      })
+        .then((realm) => {
+          {
+            for (let p of realm.objects('Recipe')) {
+              if (p.strMeal === recipe.strMeal) {
+                console.log(`${recipe.strMeal} already exist!`);
+                savedToDb(true);
+                break;
+              }
             }
           }
-        }
-        realm.close();
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+          realm.close();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }, []);
 
   return (
