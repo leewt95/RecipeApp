@@ -20,12 +20,10 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
             strCategory: recipe.strCategory,
             strInstructions: recipe.strInstructions,
             strMealThumb: recipe.strMealThumb,
-            strYoutube: recipe.strYoutube,
-            strSource: recipe.strSource,
           });
 
           for (let p = 0; p < 20; p++) {
-            if (recipe['strIngredient' + `${p + 1}`] !== '') {
+            if (recipe['strIngredient' + `${p + 1}`] !== '' || null) {
               recipeIngredients[`strIngredient${p + 1}`] =
                 recipe[`strIngredient${p + 1}`];
               recipeIngredients[`strMeasure${p + 1}`] =
