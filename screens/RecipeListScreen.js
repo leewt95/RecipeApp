@@ -125,7 +125,14 @@ const ListRecipeScreen = ({ navigation }) => {
                   })
                 }>
                 <Left>
-                  <Thumbnail square source={{ uri: `${e.strMealThumb}` }} />
+                  <Thumbnail
+                    square
+                    source={
+                      recipeList[i].strMealThumb === ''
+                        ? require('../assets/image_placeholder_200x150.png')
+                        : { uri: `${e.strMealThumb}` }
+                    }
+                  />
                 </Left>
                 <Body>
                   <Text numberOfLines={1}>{e.strMeal}</Text>
