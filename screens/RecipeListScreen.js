@@ -117,7 +117,7 @@ const ListRecipeScreen = ({ navigation }) => {
             return (
               <ListItem
                 thumbnail
-                key={e.idMeal}
+                key={i}
                 onPress={() =>
                   navigation.navigate('RecipeDetails', {
                     recipe: recipeList[i],
@@ -133,12 +133,29 @@ const ListRecipeScreen = ({ navigation }) => {
                     {e.strCategory}
                   </Text>
                 </Body>
-                <Right>
-                  <Button transparent onPress={() => deleteRecipe(e.idMeal, i)}>
+                <Right style={{ flexDirection: 'row' }}>
+                  <Button
+                    transparent
+                    style={{ alignSelf: 'center' }}
+                    onPress={() =>
+                      navigation.navigate('EditRecipe', {
+                        recipe: recipeList[i],
+                      })
+                    }>
+                    <Icon
+                      type="FontAwesome5"
+                      name="edit"
+                      style={{ color: 'blue', marginLeft: 0, marginRight: 0 }}
+                    />
+                  </Button>
+                  <Button
+                    transparent
+                    style={{ alignSelf: 'center' }}
+                    onPress={() => deleteRecipe(e.idMeal, i)}>
                     <Icon
                       type="FontAwesome5"
                       name="trash-alt"
-                      style={{ color: 'red' }}
+                      style={{ color: 'red', marginRight: 3 }}
                     />
                   </Button>
                 </Right>
