@@ -160,7 +160,9 @@ const AddRecipeScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    AddRecipeToDb();
+    if (saved) {
+      AddRecipeToDb();
+    }
   }, [saved]);
 
   return (
