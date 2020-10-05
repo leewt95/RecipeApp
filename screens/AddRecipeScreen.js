@@ -143,7 +143,6 @@ const AddRecipeScreen = ({ navigation }) => {
           onPress={() => {
             if (!saved) {
               savedToDb(true);
-              AddRecipeToDb();
             }
           }}>
           <Icon
@@ -159,6 +158,10 @@ const AddRecipeScreen = ({ navigation }) => {
   useEffect(() => {
     readXmlFile();
   }, []);
+
+  useEffect(() => {
+    AddRecipeToDb();
+  }, [saved]);
 
   return (
     <Container>
