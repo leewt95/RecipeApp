@@ -46,7 +46,5 @@ export const RecipeSchema = {
     strMeasure18: { type: 'string', default: '' },
     strMeasure19: { type: 'string', default: '' },
     strMeasure20: { type: 'string', default: '' },
-    strYoutube: { type: 'string', default: '' },
-    strSource: { type: 'string', default: '' },
   },
 };
