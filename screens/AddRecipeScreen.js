@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Button, View, Image, PermissionsAndroid } from 'react-native';
+import { Image, PermissionsAndroid } from 'react-native';
 import {
   Content,
   Container,
@@ -11,6 +11,11 @@ import {
   Picker,
   Card,
   CardItem,
+  List,
+  ListItem,
+  Button,
+  Icon,
+  Text,
 } from 'native-base';
 import Realm from 'realm';
 import { RecipeSchema } from '../database/recipeSchemas';
@@ -18,10 +23,13 @@ import ImagePicker from 'react-native-image-picker';
 import RecipeCategories from '../xml/RecipeCategories.js';
 
 const AddRecipeScreen = ({ navigation }) => {
-  const [imageSource, setImageSource] = useState(null);
-  const [selectedPickerValue, changePickerValue] = useState('');
-  const [inputForms, addForms] = useState([]);
+  const [saved, savedToDb] = useState(false);
   const [recipeCategory, setRecipeCategory] = useState([]);
+  const [recipeImage, setImageSource] = useState('');
+  const [recipeName, setRecipeName] = useState('');
+  const [selectedPickerValue, changePickerValue] = useState('');
+  const [recipeInstruction, setRecipeInstruction] = useState('');
+  const [inputIngredients, setIngredients] = useState([]);
 
   const imagePickerOptions = {
     title: 'Select Camera / Gallery',
@@ -59,10 +67,6 @@ const AddRecipeScreen = ({ navigation }) => {
     });
   };
 
-  const addNewIngredient = () => {
-    addForms([...inputForms, { meta_name: 'value', meta_value: 'value' }]);
-  };
-
   const readXmlFile = () => {
     var strXml = require('react-native-xml2js').parseString;
     var xml = RecipeCategories;
@@ -75,6 +79,83 @@ const AddRecipeScreen = ({ navigation }) => {
     }
   };
 
+  const addNewIngredient = () => {
+    setIngredients([...inputIngredients, { ingredient: '', measure: '' }]);
+  };
+
+  const removeNewIngredient = (index) => {
+    const tempIngredients = [...inputIngredients];
+    tempIngredients.splice(index, 1);
+    setIngredients(tempIngredients);
+  };
+
+  const onIngredientTextChange = (index, target, value) => {
+    const tempIngredients = [...inputIngredients];
+    tempIngredients[index][target] = value;
+    setIngredients(tempIngredients);
+    console.log(inputIngredients);
+  };
+
+  const AddRecipeToDb = async () => {
+    await Realm.open({
+      schema: [RecipeSchema],
+    })
+      .then((realm) => {
+        realm.write(() => {
+          let recipeIngredients = realm.create('Recipe', {
+            idMeal: `${realm.objects('Recipe').length + 1}`,
+            strMeal: recipeName,
+            strCategory: selectedPickerValue,
+            strInstructions: recipeInstruction,
+            strMealThumb: recipeImage,
+          });
+
+          for (let p = 0; p < inputIngredients.length; p++) {
+            recipeIngredients['strIngredient' + `${p + 1}`] =
+              inputIngredients[p]['ingredient'];
+            recipeIngredients['strMeasure' + `${p + 1}`] =
+              inputIngredients[p]['measure'];
+          }
+        });
+        {
+          for (let p of realm.objects('Recipe')) {
+            console.log(p);
+          }
+        }
+        realm.close();
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Button
+          rounded
+          androidRippleColor="gray"
+          style={{
+            marginEnd: 3,
+            elevation: 0,
+            backgroundColor: 'transparent',
+          }}
+          onPress={() => {
+            if (!saved) {
+              savedToDb(true);
+              AddRecipeToDb();
+            }
+          }}>
+          <Icon
+            type="FontAwesome5"
+            name="save"
+            style={saved ? { color: 'lightgray' } : { color: 'black' }}
+          />
+        </Button>
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     readXmlFile();
   }, []);
@@ -82,60 +163,125 @@ const AddRecipeScreen = ({ navigation }) => {
   return (
     <Container>
       <Content padder>
-        <Card>
-          <CardItem
-            cardBody
-            button
-            style={{
-              flexDirection: 'column',
-            }}
-            onPress={() => showImagePicker()}>
-            <Image
-              source={
-                imageSource === null
-                  ? { uri: 'https://via.placeholder.com/200x150' }
-                  : imageSource
-              }
-              style={{ width: '100%', height: 150 }}
-            />
-          </CardItem>
-        </Card>
         <Form>
           <Item stackedLabel style={{ marginLeft: 0 }}>
-            <Label>Name</Label>
-            <Input />
+            <Label>Image</Label>
+            <Card style={{ marginTop: 10, marginBottom: 10 }}>
+              <CardItem
+                cardBody
+                button
+                style={{
+                  width: '100%',
+                }}
+                onPress={() => showImagePicker()}>
+                <Image
+                  source={
+                    recipeImage === null || recipeImage === ''
+                      ? require('../assets/image_placeholder_200x150.png')
+                      : recipeImage
+                  }
+                  style={{ width: '100%', height: 150 }}
+                />
+              </CardItem>
+            </Card>
           </Item>
           <Item stackedLabel style={{ marginLeft: 0 }}>
-            <Label>Instructions</Label>
-            <Textarea
-              style={{ width: '100%' }}
+            <Label>Name</Label>
+            <Input
               selectTextOnFocus
-              rowSpan={5}
-              placeholder="1. ...."
+              autoCapitalize="sentences"
+              numberOfLines={1}
+              placeholder="ex. Garlic Bread"
+              value={recipeName}
+              onChangeText={(value) => {
+                setRecipeName(value);
+                console.log('Recipe Name: ' + recipeName);
+              }}
             />
           </Item>
-          <Item style={{ marginLeft: 0, marginBottom: 20 }}>
+          <Item style={{ marginLeft: 0 }}>
             <Label style={{ fontSize: 15 }}>Category</Label>
             <Picker
               mode="dropdown"
               selectedValue={selectedPickerValue}
-              onValueChange={(value) => changePickerValue(value)}>
+              onValueChange={(value) => {
+                changePickerValue(value);
+                console.log('Category: ' + selectedPickerValue);
+              }}>
               {recipeCategory.map((e, i) => {
                 return <Picker.Item key={i} label={e} value={e} />;
               })}
             </Picker>
           </Item>
-        </Form>
-        <Button title="Generate a button" onPress={() => addNewIngredient()} />
-        {inputForms.map((customInput, key) => {
-          return (
-            <Button
-              key={key}
-              title={`Button ${key + 1}`}
-              onPress={() => addNewIngredient()}
+          <Item stackedLabel style={{ marginLeft: 0, marginBottom: 20 }}>
+            <Label>Instructions</Label>
+            <Textarea
+              selectTextOnFocus
+              autoCapitalize="sentences"
+              rowSpan={5}
+              placeholder="1. ...."
+              style={{ width: '100%' }}
+              value={recipeInstruction}
+              onChangeText={(value) => {
+                setRecipeInstruction(value);
+                console.log('Recipe Instruction: ' + recipeInstruction);
+              }}
             />
-          );
-        })}
+          </Item>
+        </Form>
+        <Button
+          style={{ width: '100%', justifyContent: 'center' }}
+          onPress={() => addNewIngredient()}>
+          <Text>Add ingredient</Text>
+        </Button>
+        <List>
+          {inputIngredients.map((customInput, key) => {
+            return (
+              <ListItem key={key} style={{ marginLeft: 0 }}>
+                <Input
+                  selectTextOnFocus
+                  autoCapitalize="sentences"
+                  numberOfLines={1}
+                  placeholder="ex. Garlic"
+                  style={{
+                    borderColor: 'gray',
+                    borderBottomWidth: 1,
+                    marginEnd: 10,
+                  }}
+                  value={inputIngredients[key].ingredient}
+                  onChangeText={(value) => {
+                    onIngredientTextChange(key, 'ingredient', value);
+                  }}
+                />
+                <Input
+                  selectTextOnFocus
+                  autoCapitalize="sentences"
+                  numberOfLines={1}
+                  placeholder="ex. 1 tbsp"
+                  style={{ borderColor: 'gray', borderBottomWidth: 1 }}
+                  value={inputIngredients[key].measure}
+                  onChangeText={(value) =>
+                    onIngredientTextChange(key, 'measure', value)
+                  }
+                />
+                <Button transparent onPress={() => addNewIngredient()}>
+                  <Icon
+                    type="FontAwesome5"
+                    name="plus-circle"
+                    style={{ color: 'green', marginRight: 0 }}
+                  />
+                </Button>
+                <Button transparent onPress={() => removeNewIngredient(key)}>
+                  <Icon
+                    type="FontAwesome5"
+                    name="minus-circle"
+                    style={{ color: 'red', marginRight: 0 }}
+                  />
+                </Button>
+              </ListItem>
+            );
+          })}
+        </List>
       </Content>
     </Container>
   );
