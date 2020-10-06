@@ -25,7 +25,7 @@ const HomeScreen = ({ navigation }) => {
       .then((realm) => {
         {
           for (let p of realm.objects('Recipe')) {
-              console.log(p);
+            console.log(p);
           }
         }
         realm.close();
@@ -68,7 +68,10 @@ const HomeScreen = ({ navigation }) => {
               flexDirection: 'column',
             }}
             onPress={() =>
-              navigation.navigate('RecipeDetails', { recipe: recipe, toggleSave: true })
+              navigation.navigate('RecipeDetails', {
+                recipe: recipe,
+                toggleSave: true,
+              })
             }>
             <Image
               source={{ uri: recipe.strMealThumb }}
@@ -81,8 +84,18 @@ const HomeScreen = ({ navigation }) => {
         <Button title="Get new recipe" onPress={() => getRecipeOfTheDay()} />
         <Button title="View database" onPress={() => viewDatabase()} />
         <Button title="Clear database" onPress={() => clearDatabase()} />
-        <Button title="Add custom recipe" onPress={() => navigation.navigate('AddNewRecipe')} />
-        <Button title="Recipe list" onPress={() => navigation.navigate('RecipeList', { toggleSave: false })} />
+        <Button
+          title="Add custom recipe"
+          onPress={() =>
+            navigation.navigate('AddNewRecipe', { recipeToEdit: [], editRecipe: false })
+          }
+        />
+        <Button
+          title="Recipe list"
+          onPress={() =>
+            navigation.navigate('RecipeList', { toggleSave: false })
+          }
+        />
       </Content>
     </Container>
   );
