@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
 import { Image, PermissionsAndroid } from 'react-native';
 import {
   Content,
@@ -21,8 +21,10 @@ import Realm from 'realm';
 import { RecipeSchema } from '../database/recipeSchemas';
 import ImagePicker from 'react-native-image-picker';
 import RecipeCategories from '../xml/RecipeCategories.js';
+import UUID from 'react-native-uuid'
 
-const AddRecipeScreen = ({ navigation }) => {
+const AddRecipeScreen = ({ navigation, route }) => {
+  const { recipeToEdit, editRecipe } = route.params;
   const [saved, savedToDb] = useState(false);
   const [recipeCategory, setRecipeCategory] = useState([]);
   const [recipeImage, setImageSource] = useState('');
@@ -102,19 +104,31 @@ const AddRecipeScreen = ({ navigation }) => {
     })
       .then((realm) => {
         realm.write(() => {
-          let recipeIngredients = realm.create('Recipe', {
-            idMeal: `${realm.objects('Recipe').length + 1}`,
-            strMeal: recipeName,
-            strCategory: selectedPickerValue,
-            strInstructions: recipeInstruction,
-            strMealThumb: recipeImage,
-          });
+          let recipeDb = realm.create(
+            'Recipe',
+            {
+              idMeal: editRecipe
+                ? recipeToEdit.idMeal
+                : UUID.v4(),
+              strMeal: recipeName,
+              strCategory: selectedPickerValue,
+              strInstructions: recipeInstruction,
+              strMealThumb: recipeImage,
+            },
+            true,
+          );
 
+          const tempIngredients = [];
+          for (let p = 0; p < 20; p++) {
+            tempIngredients.push({ ingredient: '', measure: '' });
+          }
           for (let p = 0; p < inputIngredients.length; p++) {
-            recipeIngredients['strIngredient' + `${p + 1}`] =
-              inputIngredients[p]['ingredient'];
-            recipeIngredients['strMeasure' + `${p + 1}`] =
-              inputIngredients[p]['measure'];
+            tempIngredients[p].ingredient = inputIngredients[p].ingredient;
+            tempIngredients[p].measure = inputIngredients[p].measure;
+          }
+          for (let p = 0; p < tempIngredients.length; p++) {
+            recipeDb[`strIngredient${p + 1}`] = tempIngredients[p].ingredient;
+            recipeDb[`strMeasure${p + 1}`] = tempIngredients[p].measure;
           }
         });
         {
@@ -123,14 +137,33 @@ const AddRecipeScreen = ({ navigation }) => {
           }
         }
         realm.close();
+        navigation.goBack();
       })
       .catch((e) => {
         console.log(e);
       });
   };
 
+  const dataBindRecipeToComponent = () => {
+    setRecipeName(recipeToEdit.strMeal);
+    changePickerValue(recipeToEdit.strCategory);
+    setImageSource(recipeToEdit.strMealThumb);
+    setRecipeInstruction(recipeToEdit.strInstructions);
+    const tempRecipeIngredients = [];
+    for (let p = 0; p < 20; p++) {
+      if (recipeToEdit['strIngredient' + `${p + 1}`] !== '' || null) {
+        tempRecipeIngredients.push({
+          ingredient: recipeToEdit[`strIngredient${p + 1}`],
+          measure: recipeToEdit[`strMeasure${p + 1}`],
+        });
+      }
+    }
+    setIngredients(tempRecipeIngredients);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
+      title: editRecipe ? 'Edit Recipe' : 'Add Recipe',
       headerRight: () => (
         <Button
           rounded
@@ -157,11 +190,17 @@ const AddRecipeScreen = ({ navigation }) => {
 
   useEffect(() => {
     readXmlFile();
+    if (editRecipe) {
+      dataBindRecipeToComponent();
+    }
   }, []);
 
+  const didMountRef = useRef(false);
   useEffect(() => {
-    if (saved) {
+    if (didMountRef.current) {
       AddRecipeToDb();
+    } else {
+      didMountRef.current = true
     }
   }, [saved]);
 
@@ -183,7 +222,7 @@ const AddRecipeScreen = ({ navigation }) => {
                   source={
                     recipeImage === null || recipeImage === ''
                       ? require('../assets/image_placeholder_200x150.png')
-                      : recipeImage
+                      : { uri: recipeImage }
                   }
                   style={{ width: '100%', height: 150 }}
                 />
@@ -194,7 +233,7 @@ const AddRecipeScreen = ({ navigation }) => {
             <Label>Name</Label>
             <Input
               selectTextOnFocus
-              autoCapitalize="sentences"
+              autoCapitalize='words'
               numberOfLines={1}
               placeholder="ex. Garlic Bread"
               value={recipeName}
