@@ -1,7 +1,8 @@
 export const RecipeSchema = {
   name: 'Recipe',
+  primaryKey: 'idMeal',
   properties: {
-    idMeal: { type: 'string', default: '' },
+    idMeal: 'string',
     strMeal: { type: 'string', default: '' },
     strCategory: { type: 'string', default: '' },
     strInstructions: { type: 'string', default: '' },
