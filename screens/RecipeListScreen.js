@@ -67,22 +67,24 @@ const ListRecipeScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    Realm.open({
-      schema: [RecipeSchema],
-    })
-      .then((realm) => {
-        var recipeArray = [];
-        if (realm.objects('Recipe').length > 0) {
-          for (let p of realm.objects('Recipe')) {
-            recipeArray.push(JSON.parse(JSON.stringify(p)));
-          }
-        }
-        setRecipeList(recipeArray);
-        realm.close();
+    const navEventUnsubscribe = navigation.addListener('focus', () => {
+      Realm.open({
+        schema: [RecipeSchema],
       })
-      .catch((e) => {
-        console.log(e);
-      });
+        .then((realm) => {
+          var recipeArray = [];
+          if (realm.objects('Recipe').length > 0) {
+            for (let p of realm.objects('Recipe')) {
+              recipeArray.push(JSON.parse(JSON.stringify(p)));
+            }
+          }
+          setRecipeList(recipeArray);
+          realm.close();
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    });
 
     var strXml = require('react-native-xml2js').parseString;
     var xml = RecipeCategories;
@@ -93,6 +95,8 @@ const ListRecipeScreen = ({ navigation }) => {
     } catch (e) {
       console.log(e);
     }
+
+    return navEventUnsubscribe
   }, []);
 
   return (
@@ -145,8 +149,9 @@ const ListRecipeScreen = ({ navigation }) => {
                     transparent
                     style={{ alignSelf: 'center' }}
                     onPress={() =>
-                      navigation.navigate('EditRecipe', {
-                        recipe: recipeList[i],
+                      navigation.navigate('AddNewRecipe', {
+                        recipeToEdit: recipeList[i],
+                        editRecipe: true,
                       })
                     }>
                     <Icon
