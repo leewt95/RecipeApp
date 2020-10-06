@@ -8,7 +8,6 @@ import SplashScreen from 'react-native-splash-screen';
 import HomeScreen from './screens/HomeScreen';
 import RecipeDetailsScreen from './screens/RecipeDetailsScreen';
 import AddRecipeScreen from './screens/AddRecipeScreen';
-import EditRecipeScreen from './screens/EditRecipeScreen';
 import RecipeListScreen from './screens/RecipeListScreen';
 
 const Stack = createStackNavigator();
@@ -42,15 +41,7 @@ const App = () => {
           name="AddNewRecipe"
           component={AddRecipeScreen}
           options={{
-            title: 'Add Custom Recipe',
-            headerTitleAlign: 'center',
-          }}
-        />
-        <Stack.Screen
-          name="EditRecipe"
-          component={EditRecipeScreen}
-          options={{
-            title: 'Edit Recipe',
+            title: 'Add Recipe',
             headerTitleAlign: 'center',
           }}
         />
