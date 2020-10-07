@@ -4,14 +4,18 @@ import { Card, CardItem, Container, Content } from 'native-base';
 import TheMealDb from '../api/TheMealDb';
 import Realm from 'realm';
 import { RecipeSchema } from '../database/recipeSchemas';
+import { useDispatch, useSelector } from 'react-redux';
 
 const HomeScreen = ({ navigation }) => {
-  const [recipe, setRecipe] = useState([]);
+  const { recipeApi, isLoading } = useSelector(
+    ({ recipeApiReducer }) => recipeApiReducer,
+  );
+  const dispatch = useDispatch();
 
   const getRecipeOfTheDay = async () => {
     await TheMealDb.get('/random.php')
       .then((response) => {
-        setRecipe(response.data.meals[0]);
+        dispatch({ type: 'API_GET_RECIPE', payload: response.data.meals[0] });
       })
       .catch((e) => {
         alert(e);
@@ -69,15 +73,15 @@ const HomeScreen = ({ navigation }) => {
             }}
             onPress={() =>
               navigation.navigate('RecipeDetails', {
-                recipe: recipe,
+                recipe: recipeApi,
                 toggleSave: true,
               })
             }>
             <Image
-              source={{ uri: recipe.strMealThumb }}
+              source={{ uri: recipeApi.strMealThumb }}
               style={{ width: '100%', height: 200 }}
             />
-            <Text>{recipe.strMeal}</Text>
+            <Text>{recipeApi.strMeal}</Text>
           </CardItem>
         </Card>
         <Text>Powered by TheMealDB</Text>
@@ -87,7 +91,10 @@ const HomeScreen = ({ navigation }) => {
         <Button
           title="Add custom recipe"
           onPress={() =>
-            navigation.navigate('AddNewRecipe', { recipeToEdit: [], editRecipe: false })
+            navigation.navigate('AddNewRecipe', {
+              recipeToEdit: [],
+              editRecipe: false,
+            })
           }
         />
         <Button
