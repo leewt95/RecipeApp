@@ -11,6 +11,7 @@ import AddRecipeScreen from './screens/AddRecipeScreen';
 import RecipeListScreen from './screens/RecipeListScreen';
 import { Provider } from 'react-redux';
 import { recipeStore } from './reducer/RootReducer.js';
+import { NAVIGATION_STACK } from './constants/Constants';
 
 const Stack = createStackNavigator();
 
@@ -23,36 +24,36 @@ const App = () => {
     <Provider store={recipeStore}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName={NAVIGATION_STACK.HOME.name}
           screenOptions={{
             ...TransitionPresets.SlideFromRightIOS,
           }}>
           <Stack.Screen
-            name="Home"
+            name={NAVIGATION_STACK.HOME.name}
             component={HomeScreen}
             options={{
-              title: 'RecipeApp React Native',
+              title: NAVIGATION_STACK.HOME.title,
               headerTitleAlign: 'center',
             }}
           />
           <Stack.Screen
-            name="RecipeDetails"
+            name={NAVIGATION_STACK.RECIPE_DETAIL.name}
             component={RecipeDetailsScreen}
             options={({ route }) => ({ title: route.params.recipe.strMeal })}
           />
           <Stack.Screen
-            name="AddNewRecipe"
+            name={NAVIGATION_STACK.ADD_NEW_RECIPE.name}
             component={AddRecipeScreen}
             options={{
-              title: 'Add Recipe',
+              title: NAVIGATION_STACK.ADD_NEW_RECIPE.title,
               headerTitleAlign: 'center',
             }}
           />
           <Stack.Screen
-            name="RecipeList"
+            name={NAVIGATION_STACK.RECIPE_LIST.name}
             component={RecipeListScreen}
             options={{
-              title: 'Recipe List',
+              title: NAVIGATION_STACK.RECIPE_LIST.title,
               headerTitleAlign: 'center',
             }}
           />

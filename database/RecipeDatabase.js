@@ -1,5 +1,6 @@
 import Realm from 'realm';
 import { RecipeSchema } from './RecipeSchema';
+import { DATABASE_RECIPE } from '../constants/Constants'
 
 export const viewDatabase = async () => {
   await Realm.open({
@@ -7,7 +8,7 @@ export const viewDatabase = async () => {
   })
     .then((realm) => {
       {
-        for (let p of realm.objects('Recipe')) {
+        for (let p of realm.objects(DATABASE_RECIPE)) {
           console.log(p);
         }
       }
@@ -24,7 +25,7 @@ export const clearDatabase = async () => {
   })
     .then((realm) => {
       realm.write(() => {
-        realm.delete(realm.objects('Recipe'));
+        realm.delete(realm.objects(DATABASE_RECIPE));
       });
       realm.close();
       console.log('Database cleared!');
