@@ -1,15 +1,10 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Content,
   Container,
-  Form,
   Item,
   Label,
-  Input,
-  Textarea,
   Picker,
-  Card,
-  CardItem,
   List,
   ListItem,
   Thumbnail,
@@ -22,9 +17,16 @@ import {
 } from 'native-base';
 import Realm from 'realm';
 import { RecipeSchema } from '../database/RecipeSchema';
-import RecipeCategories from '../xml/RecipeCategories.js';
+import { useSelector, useDispatch } from 'react-redux';
 
 const ListRecipeScreen = ({ navigation }) => {
+  // const { recipeList } = useSelector(
+  //   ({ recipeDatabaseReducer }) => recipeDatabaseReducer,
+  // );
+  const { recipeCategories } = useSelector(
+    ({ recipeCategoriesReducer }) => recipeCategoriesReducer,
+  );
+  const dispatch = useDispatch();
   const [recipeList, setRecipeList] = useState([]);
   const [recipeCategory, setRecipeCategory] = useState([]);
   const [selectedPickerValue, changePickerValue] = useState('Beef');
@@ -86,17 +88,17 @@ const ListRecipeScreen = ({ navigation }) => {
         });
     });
 
-    var strXml = require('react-native-xml2js').parseString;
-    var xml = RecipeCategories;
-    try {
-      strXml(xml, (err, result) => {
-        setRecipeCategory(result.RecipeCategories.Category);
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    // var strXml = require('react-native-xml2js').parseString;
+    // var xml = RecipeCategories;
+    // try {
+    //   strXml(xml, (err, result) => {
+    //     setRecipeCategory(result.RecipeCategories.Category);
+    //   });
+    // } catch (e) {
+    //   console.log(e);
+    // }
 
-    return navEventUnsubscribe
+    return navEventUnsubscribe;
   }, []);
 
   return (
@@ -111,7 +113,7 @@ const ListRecipeScreen = ({ navigation }) => {
               changePickerValue(value);
               filterRecipe(value);
             }}>
-            {recipeCategory.map((e, i) => {
+            {recipeCategories.map((e, i) => {
               return <Picker.Item key={i} label={e} value={e} />;
             })}
           </Picker>
