@@ -21,7 +21,7 @@ import {
   Icon,
 } from 'native-base';
 import Realm from 'realm';
-import { RecipeSchema } from '../database/recipeSchemas';
+import { RecipeSchema } from '../database/RecipeSchema';
 import RecipeCategories from '../xml/RecipeCategories.js';
 
 const ListRecipeScreen = ({ navigation }) => {

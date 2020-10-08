@@ -2,7 +2,7 @@ import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { Text } from 'react-native';
 import { Content, Container, Icon, Button } from 'native-base';
 import Realm from 'realm';
-import { RecipeSchema } from '../database/recipeSchemas';
+import { RecipeSchema } from '../database/RecipeSchema';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
   const [saved, savedToDb] = useState(false);

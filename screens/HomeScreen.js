@@ -3,7 +3,7 @@ import { Button, Text, Image } from 'react-native';
 import { Card, CardItem, Container, Content } from 'native-base';
 import TheMealDb from '../api/TheMealDb';
 import Realm from 'realm';
-import { RecipeSchema } from '../database/recipeSchemas';
+import { RecipeSchema } from '../database/RecipeSchema';
 import { useDispatch, useSelector } from 'react-redux';
 
 const HomeScreen = ({ navigation }) => {

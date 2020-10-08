@@ -18,7 +18,7 @@ import {
   Text,
 } from 'native-base';
 import Realm from 'realm';
-import { RecipeSchema } from '../database/recipeSchemas';
+import { RecipeSchema } from '../database/RecipeSchema';
 import ImagePicker from 'react-native-image-picker';
 import RecipeCategories from '../xml/RecipeCategories.js';
 import UUID from 'react-native-uuid'
