@@ -1,47 +1,13 @@
 import React, { useEffect } from 'react';
 import { Button, Text, Image } from 'react-native';
 import { Card, CardItem, Container, Content } from 'native-base';
-import Realm from 'realm';
+import { viewDatabase, clearDatabase } from '../database/RecipeDatabase';
 import { getRecipeOfTheDay } from '../reducer/RecipeApiReducer';
-import { RecipeSchema } from '../database/RecipeSchema';
 import { useDispatch, useSelector } from 'react-redux';
 
 const HomeScreen = ({ navigation }) => {
   const { recipeApi } = useSelector(({ recipeApiReducer }) => recipeApiReducer);
   const dispatch = useDispatch();
-
-  const viewDatabase = async () => {
-    await Realm.open({
-      schema: [RecipeSchema],
-    })
-      .then((realm) => {
-        {
-          for (let p of realm.objects('Recipe')) {
-            console.log(p);
-          }
-        }
-        realm.close();
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const clearDatabase = async () => {
-    await Realm.open({
-      schema: [RecipeSchema],
-    })
-      .then((realm) => {
-        realm.write(() => {
-          realm.delete(realm.objects('Recipe'));
-        });
-        realm.close();
-        console.log('Database cleared!');
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
 
   useEffect(() => {
     getRecipeOfTheDay(dispatch);
