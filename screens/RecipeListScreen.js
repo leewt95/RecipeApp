@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Content,
   Container,
@@ -15,91 +15,42 @@ import {
   Button,
   Icon,
 } from 'native-base';
-import Realm from 'realm';
-import { RecipeSchema } from '../database/RecipeSchema';
+import { updateSelectedCategory } from '../reducer/RecipeCategoriesReducer';
+import {
+  loadRecipeFromDatabase,
+  filterRecipe,
+  deleteRecipe,
+} from '../reducer/RecipeDatabaseReducer';
 import { useSelector, useDispatch } from 'react-redux';
+import { NAVIGATION_STACK } from '../constants/Constants';
 
 const ListRecipeScreen = ({ navigation }) => {
-  // const { recipeList } = useSelector(
-  //   ({ recipeDatabaseReducer }) => recipeDatabaseReducer,
-  // );
-  const { recipeCategories } = useSelector(
-    ({ recipeCategoriesReducer }) => recipeCategoriesReducer,
+  const { recipeList } = useSelector(
+    ({ recipeDatabaseReducer }) => recipeDatabaseReducer,
   );
+  const {
+    recipeCategories,
+    firstCategoryValue,
+    selectedCategory,
+  } = useSelector(({ recipeCategoriesReducer }) => recipeCategoriesReducer);
   const dispatch = useDispatch();
-  const [recipeList, setRecipeList] = useState([]);
-  const [recipeCategory, setRecipeCategory] = useState([]);
-  const [selectedPickerValue, changePickerValue] = useState('Beef');
-
-  const filterRecipe = (filterQuery) => {
-    Realm.open({
-      schema: [RecipeSchema],
-    }).then((realm) => {
-      var recipeArray = [];
-      let recipeQuery = realm
-        .objects('Recipe')
-        .filtered(`strCategory = "${filterQuery}"`);
-      if (recipeQuery.length > 0) {
-        for (let p of recipeQuery) {
-          recipeArray.push(JSON.parse(JSON.stringify(p)));
-        }
-      }
-      setRecipeList(recipeArray);
-      realm.close();
-    });
-  };
-
-  const deleteRecipe = (idMeal, index) => {
-    Realm.open({
-      schema: [RecipeSchema],
-    }).then((realm) => {
-      let deleteRecipe = realm
-        .objects('Recipe')
-        .filtered(`idMeal = "${idMeal}"`);
-      realm.write(() => {
-        realm.delete(deleteRecipe);
-        console.log(`DELETED ${idMeal}`);
-      });
-      realm.close();
-    });
-    const recipeListCopy = [...recipeList];
-    recipeListCopy.splice(index, 1);
-    setRecipeList(recipeListCopy);
-    console.log('DELETED: new size-> ' + recipeList.length);
-  };
 
   useEffect(() => {
-    const navEventUnsubscribe = navigation.addListener('focus', () => {
-      Realm.open({
-        schema: [RecipeSchema],
-      })
-        .then((realm) => {
-          var recipeArray = [];
-          if (realm.objects('Recipe').length > 0) {
-            for (let p of realm.objects('Recipe')) {
-              recipeArray.push(JSON.parse(JSON.stringify(p)));
-            }
-          }
-          setRecipeList(recipeArray);
-          realm.close();
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    });
-
-    // var strXml = require('react-native-xml2js').parseString;
-    // var xml = RecipeCategories;
-    // try {
-    //   strXml(xml, (err, result) => {
-    //     setRecipeCategory(result.RecipeCategories.Category);
-    //   });
-    // } catch (e) {
-    //   console.log(e);
-    // }
-
-    return navEventUnsubscribe;
+    updateSelectedCategory(firstCategoryValue, dispatch);
+    loadRecipeFromDatabase(dispatch);
   }, []);
+
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    if (didMountRef.current) {
+      const navEventUnsubscribe = navigation.addListener('focus', () => {
+        filterRecipe(selectedCategory, dispatch);
+      });
+      return navEventUnsubscribe;
+    } else {
+      didMountRef.current = true;
+    }
+  }, [recipeList]);
 
   return (
     <Container>
@@ -108,10 +59,10 @@ const ListRecipeScreen = ({ navigation }) => {
           <Label style={{ fontSize: 15 }}>Category</Label>
           <Picker
             mode="dropdown"
-            selectedValue={selectedPickerValue}
+            selectedValue={selectedCategory}
             onValueChange={(value) => {
-              changePickerValue(value);
-              filterRecipe(value);
+              updateSelectedCategory(value, dispatch);
+              filterRecipe(value, dispatch);
             }}>
             {recipeCategories.map((e, i) => {
               return <Picker.Item key={i} label={e} value={e} />;
@@ -125,7 +76,7 @@ const ListRecipeScreen = ({ navigation }) => {
                 thumbnail
                 key={i}
                 onPress={() =>
-                  navigation.navigate('RecipeDetails', {
+                  navigation.navigate(NAVIGATION_STACK.RECIPE_DETAIL.name, {
                     recipe: recipeList[i],
                     toggleSave: false,
                   })
@@ -151,10 +102,13 @@ const ListRecipeScreen = ({ navigation }) => {
                     transparent
                     style={{ alignSelf: 'center' }}
                     onPress={() =>
-                      navigation.navigate('AddNewRecipe', {
-                        recipeToEdit: recipeList[i],
-                        editRecipe: true,
-                      })
+                      navigation.navigate(
+                        NAVIGATION_STACK.ADD_NEW_RECIPE.name,
+                        {
+                          recipeToEdit: recipeList[i],
+                          editRecipe: true,
+                        },
+                      )
                     }>
                     <Icon
                       type="FontAwesome5"
@@ -165,7 +119,7 @@ const ListRecipeScreen = ({ navigation }) => {
                   <Button
                     transparent
                     style={{ alignSelf: 'center' }}
-                    onPress={() => deleteRecipe(e.idMeal, i)}>
+                    onPress={() => deleteRecipe(e.idMeal, i, dispatch)}>
                     <Icon
                       type="FontAwesome5"
                       name="trash-alt"
