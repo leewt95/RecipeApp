@@ -10,7 +10,7 @@ import RecipeDetailsScreen from './screens/RecipeDetailsScreen';
 import AddRecipeScreen from './screens/AddRecipeScreen';
 import RecipeListScreen from './screens/RecipeListScreen';
 import { Provider } from 'react-redux';
-import { recipeStore } from './reducer/RecipeReducer.js';
+import { recipeStore } from './reducer/RootReducer.js';
 
 const Stack = createStackNavigator();
 
