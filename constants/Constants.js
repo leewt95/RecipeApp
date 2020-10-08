@@ -16,9 +16,14 @@ export const NAVIGATION_STACK = {
  * Database
  */
 export const DATABASE_RECIPE = 'Recipe';
+export const RECIPE_ID = 'idMeal';
+export const RECIPE_CATEGORY = 'strCategory';
 
 /*
  * Reducers
  */
-export const READ_XML_CATEGORIES = 'READ_XML_CATEGORIES'
+export const READ_XML_CATEGORIES = 'READ_XML_CATEGORIES';
+export const UPDATE_SELECTED_CATEGORY = 'UPDATE_SELECTED_CATEGORY';
 export const API_GET_RECIPE = 'API_GET_RECIPE';
+export const DATABASE_GET_RECIPE = 'DATABASE_GET_RECIPE';
+export const DATABASE_DELETE_RECIPE = 'DATABASE_DELETE_RECIPE';
