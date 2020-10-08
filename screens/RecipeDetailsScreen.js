@@ -23,7 +23,10 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
           });
 
           for (let p = 0; p < 20; p++) {
-            if (recipe['strIngredient' + `${p + 1}`] !== '' || null) {
+            if (
+              recipe['strIngredient' + `${p + 1}`] !== null &&
+              recipe['strIngredient' + `${p + 1}`] !== ''
+            ) {
               recipeIngredients[`strIngredient${p + 1}`] =
                 recipe[`strIngredient${p + 1}`];
               recipeIngredients[`strMeasure${p + 1}`] =
