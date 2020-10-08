@@ -3,7 +3,9 @@ import { Button, Text, Image } from 'react-native';
 import { Card, CardItem, Container, Content } from 'native-base';
 import { viewDatabase, clearDatabase } from '../database/RecipeDatabase';
 import { getRecipeOfTheDay } from '../reducer/RecipeApiReducer';
+import { readRecipeCategories } from '../reducer/RecipeCategoriesReducer';
 import { useDispatch, useSelector } from 'react-redux';
+import { NAVIGATION_STACK } from '../constants/Constants';
 
 const HomeScreen = ({ navigation }) => {
   const { recipeApi } = useSelector(({ recipeApiReducer }) => recipeApiReducer);
@@ -11,6 +13,7 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     getRecipeOfTheDay(dispatch);
+    readRecipeCategories(dispatch);
   }, []);
 
   return (
@@ -26,7 +29,7 @@ const HomeScreen = ({ navigation }) => {
               flexDirection: 'column',
             }}
             onPress={() =>
-              navigation.navigate('RecipeDetails', {
+              navigation.navigate(NAVIGATION_STACK.RECIPE_DETAIL.name, {
                 recipe: recipeApi,
                 toggleSave: true,
               })
@@ -48,7 +51,7 @@ const HomeScreen = ({ navigation }) => {
         <Button
           title="Add custom recipe"
           onPress={() =>
-            navigation.navigate('AddNewRecipe', {
+            navigation.navigate(NAVIGATION_STACK.ADD_NEW_RECIPE.name, {
               recipeToEdit: [],
               editRecipe: false,
             })
@@ -57,7 +60,9 @@ const HomeScreen = ({ navigation }) => {
         <Button
           title="Recipe list"
           onPress={() =>
-            navigation.navigate('RecipeList', { toggleSave: false })
+            navigation.navigate(NAVIGATION_STACK.RECIPE_LIST.name, {
+              toggleSave: false,
+            })
           }
         />
       </Content>
