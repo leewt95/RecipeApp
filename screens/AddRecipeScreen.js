@@ -19,7 +19,7 @@ import {
   Toast,
 } from 'native-base';
 import { NAVIGATION_STACK } from '../constants/Constants';
-import { addRecipeToDb } from '../database/RecipeDatabase';
+import { addEditRecipeToDbForms } from '../database/RecipeDatabase';
 import { updateSelectedCategoryWithoutAll } from '../reducer/RecipeCategoriesReducer';
 import {
   showImagePicker,
@@ -91,7 +91,7 @@ const AddRecipeScreen = ({ navigation, route }) => {
   const didMountRef = useRef(false);
   useEffect(() => {
     if (didMountRef.current) {
-      addRecipeToDb(
+      addEditRecipeToDbForms(
         navigation,
         recipeName,
         selectedCategoryWithoutAll,

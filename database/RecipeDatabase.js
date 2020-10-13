@@ -40,7 +40,7 @@ export const clearDatabase = async () => {
     });
 };
 
-export const addRecipeToDb = async (
+export const addEditRecipeToDbForms = async (
   navigation,
   recipeName,
   selectedCategory,
@@ -68,13 +68,16 @@ export const addRecipeToDb = async (
         );
 
         const tempIngredients = [];
+        // First, pre-populate 20 ingredient and measurement to follow API database
         for (let p = 0; p < 20; p++) {
           tempIngredients.push({ ingredient: '', measure: '' });
         }
+        // Then, insert values based on argument
         for (let p = 0; p < recipeIngredients.length; p++) {
           tempIngredients[p].ingredient = recipeIngredients[p].ingredient;
           tempIngredients[p].measure = recipeIngredients[p].measure;
         }
+        // Finally, insert to database object
         for (let p = 0; p < tempIngredients.length; p++) {
           recipeDb[`${RECIPE_STR_INGREDIENT}${p + 1}`] =
             tempIngredients[p].ingredient;
