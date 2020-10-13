@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { Button, Text, Image } from 'react-native';
 import { Card, CardItem, Container, Content } from 'native-base';
-import { viewDatabase, clearDatabase } from '../database/RecipeDatabase';
+import {
+  viewDatabase,
+  clearDatabase,
+  checkIfDatabaseExist,
+} from '../database/RecipeDatabase';
 import { getRecipeOfTheDay } from '../reducer/RecipeApiReducer';
 import { readRecipeCategories } from '../reducer/RecipeCategoriesReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +18,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     getRecipeOfTheDay(dispatch);
     readRecipeCategories(dispatch);
+    checkIfDatabaseExist();
   }, []);
 
   return (

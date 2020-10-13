@@ -5,7 +5,9 @@ import {
   RECIPE_STR_INGREDIENT,
   RECIPE_STR_MEASURE,
 } from '../constants/Constants';
+import { mockRecipe } from './RecipeMock';
 import UUID from 'react-native-uuid';
+import RNFS from 'react-native-fs';
 
 export const viewDatabase = async () => {
   await Realm.open({
@@ -34,6 +36,56 @@ export const clearDatabase = async () => {
       });
       realm.close();
       console.log('Database cleared!');
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
+export const checkIfDatabaseExist = async () => {
+  await RNFS.exists(`${RNFS.DocumentDirectoryPath}/default.realm`)
+    .then((exists) => {
+      if (!exists) {
+        addRecipeToDb(mockRecipe);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
+export const addRecipeToDb = async (recipe) => {
+  await Realm.open({
+    schema: [RecipeSchema],
+  })
+    .then((realm) => {
+      realm.write(() => {
+        let recipeIngredients = realm.create(DATABASE_RECIPE, {
+          idMeal: recipe.idMeal,
+          strMeal: recipe.strMeal,
+          strCategory: recipe.strCategory,
+          strInstructions: recipe.strInstructions,
+          strMealThumb: recipe.strMealThumb,
+        });
+
+        for (let p = 0; p < 20; p++) {
+          if (
+            recipe['strIngredient' + `${p + 1}`] !== null &&
+            recipe['strIngredient' + `${p + 1}`] !== ''
+          ) {
+            recipeIngredients[`strIngredient${p + 1}`] =
+              recipe[`strIngredient${p + 1}`];
+            recipeIngredients[`strMeasure${p + 1}`] =
+              recipe[`strMeasure${p + 1}`];
+          }
+        }
+      });
+      {
+        for (let p of realm.objects(DATABASE_RECIPE)) {
+          console.log(p);
+        }
+      }
+      realm.close();
     })
     .catch((e) => {
       console.log(e);
