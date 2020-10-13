@@ -51,16 +51,12 @@ export const showImagePicker = async (dispatch) => {
         } else if (response.customButton) {
           console.log('User tapped custom button: ', response.customButton);
         } else {
-          const source = { uri: response.uri };
+          const source = response.uri;
           dispatch({ type: SET_RECIPE_IMAGE, payload: source });
         }
       });
     }
   });
-};
-
-export const setRecipeImage = (value, dispatch) => {
-  dispatch({ type: SET_RECIPE_IMAGE, payload: value });
 };
 
 export const setRecipeName = (value, dispatch) => {
