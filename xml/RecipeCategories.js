@@ -1,6 +1,7 @@
 const RecipeCategories = 
 `<?xml version='1.0' encoding='utf-8'?>
     <RecipeCategories>
+        <Category>All</Category>
         <Category>Beef</Category>
         <Category>Chicken</Category>
         <Category>Dessert</Category>
