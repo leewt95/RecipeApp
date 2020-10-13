@@ -20,7 +20,7 @@ import {
 } from 'native-base';
 import { NAVIGATION_STACK } from '../constants/Constants';
 import { addRecipeToDb } from '../database/RecipeDatabase';
-import { updateSelectedCategory } from '../reducer/RecipeCategoriesReducer';
+import { updateSelectedCategoryWithoutAll } from '../reducer/RecipeCategoriesReducer';
 import {
   showImagePicker,
   setRecipeName,
@@ -39,7 +39,7 @@ const AddRecipeScreen = ({ navigation, route }) => {
   const {
     recipeCategoriesWithoutAll,
     firstCategoryValueWithoutAll,
-    selectedCategory,
+    selectedCategoryWithoutAll,
   } = useSelector(({ recipeCategoriesReducer }) => recipeCategoriesReducer);
   const {
     recipeImage,
@@ -80,10 +80,10 @@ const AddRecipeScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (!editRecipe) {
-      updateSelectedCategory(firstCategoryValueWithoutAll, dispatch);
+      updateSelectedCategoryWithoutAll(firstCategoryValueWithoutAll, dispatch);
       resetRecipeForms(dispatch);
     } else {
-      updateSelectedCategory(recipeToEdit.strCategory, dispatch);
+      updateSelectedCategoryWithoutAll(recipeToEdit.strCategory, dispatch);
       setRecipeToEdit(recipeToEdit, dispatch);
     }
   }, []);
@@ -94,7 +94,7 @@ const AddRecipeScreen = ({ navigation, route }) => {
       addRecipeToDb(
         navigation,
         recipeName,
-        selectedCategory,
+        selectedCategoryWithoutAll,
         recipeInstruction,
         recipeImage,
         recipeIngredients,
@@ -155,9 +155,9 @@ const AddRecipeScreen = ({ navigation, route }) => {
             <Label style={{ fontSize: 15 }}>Category</Label>
             <Picker
               mode="dropdown"
-              selectedValue={selectedCategory}
+              selectedValue={selectedCategoryWithoutAll}
               onValueChange={(value) => {
-                updateSelectedCategory(value, dispatch);
+                updateSelectedCategoryWithoutAll(value, dispatch);
               }}>
               {recipeCategoriesWithoutAll.map((e, i) => {
                 return <Picker.Item key={i} label={e} value={e} />;

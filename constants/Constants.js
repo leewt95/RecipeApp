@@ -18,8 +18,8 @@ export const NAVIGATION_STACK = {
 export const DATABASE_RECIPE = 'Recipe';
 export const RECIPE_ID = 'idMeal';
 export const RECIPE_CATEGORY = 'strCategory';
-export const RECIPE_STR_INGREDIENT = 'strIngredient'
-export const RECIPE_STR_MEASURE = 'strMeasure'
+export const RECIPE_STR_INGREDIENT = 'strIngredient';
+export const RECIPE_STR_MEASURE = 'strMeasure';
 
 /*
  * Reducers
@@ -27,6 +27,8 @@ export const RECIPE_STR_MEASURE = 'strMeasure'
 // RecipeCategoriesReducer
 export const READ_XML_CATEGORIES = 'READ_XML_CATEGORIES';
 export const UPDATE_SELECTED_CATEGORY = 'UPDATE_SELECTED_CATEGORY';
+export const UPDATE_SELECTED_CATEGORY_WITHOUT_ALL =
+  'UPDATE_SELECTED_CATEGORY_WITHOUT_ALL';
 // RecipeAPIReducer
 export const API_GET_RECIPE = 'API_GET_RECIPE';
 // RecipeDatabaseReducer
