@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Content,
   Container,
@@ -41,16 +42,19 @@ const ListRecipeScreen = ({ navigation }) => {
   }, []);
 
   const didMountRef = useRef(false);
-  useEffect(() => {
-    if (didMountRef.current) {
-      const navEventUnsubscribe = navigation.addListener('focus', () => {
-        filterRecipe(selectedCategory, dispatch);
-      });
-      return navEventUnsubscribe;
-    } else {
-      didMountRef.current = true;
-    }
-  }, [recipeList]);
+  useFocusEffect(
+    useCallback(() => {
+      if (didMountRef.current) {
+        if (selectedCategory === firstCategoryValue) {
+          loadRecipeFromDatabase(dispatch);
+        } else {
+          filterRecipe(selectedCategory, dispatch);
+        }
+      } else {
+        didMountRef.current = true;
+      }
+    }, [selectedCategory]),
+  );
 
   return (
     <Container>
@@ -62,7 +66,11 @@ const ListRecipeScreen = ({ navigation }) => {
             selectedValue={selectedCategory}
             onValueChange={(value) => {
               updateSelectedCategory(value, dispatch);
-              filterRecipe(value, dispatch);
+              if (value === firstCategoryValue) {
+                loadRecipeFromDatabase(dispatch);
+              } else {
+                filterRecipe(value, dispatch);
+              }
             }}>
             {recipeCategories.map((e, i) => {
               return <Picker.Item key={i} label={e} value={e} />;
