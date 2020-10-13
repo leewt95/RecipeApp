@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
-import { Image, PermissionsAndroid } from 'react-native';
+import { Image } from 'react-native';
 import {
   Content,
   Container,
@@ -16,154 +16,44 @@ import {
   Button,
   Icon,
   Text,
+  Toast,
 } from 'native-base';
-import Realm from 'realm';
-import { RecipeSchema } from '../database/RecipeSchema';
-import ImagePicker from 'react-native-image-picker';
-import RecipeCategories from '../xml/RecipeCategories.js';
-import UUID from 'react-native-uuid'
+import { NAVIGATION_STACK } from '../constants/Constants';
+import { addRecipeToDb } from '../database/RecipeDatabase';
+import { updateSelectedCategory } from '../reducer/RecipeCategoriesReducer';
+import {
+  showImagePicker,
+  setRecipeName,
+  setRecipeInstruction,
+  onIngredientTextChange,
+  addIngredient,
+  removeIngredient,
+  setRecipeToEdit,
+  resetRecipeForms,
+} from '../reducer/RecipeFormsReducer';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AddRecipeScreen = ({ navigation, route }) => {
   const { recipeToEdit, editRecipe } = route.params;
   const [saved, savedToDb] = useState(false);
-  const [recipeCategory, setRecipeCategory] = useState([]);
-  const [recipeImage, setImageSource] = useState('');
-  const [recipeName, setRecipeName] = useState('');
-  const [selectedPickerValue, changePickerValue] = useState('');
-  const [recipeInstruction, setRecipeInstruction] = useState('');
-  const [inputIngredients, setIngredients] = useState([]);
-
-  const imagePickerOptions = {
-    title: 'Select Camera / Gallery',
-    noData: true,
-    storageOptions: {
-      skipBackup: true,
-      privateDirectory: true,
-      path: 'images',
-    },
-  };
-
-  const showImagePicker = async () => {
-    await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    ]).then((result) => {
-      if (
-        result['android.permission.CAMERA'] &&
-        result['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted'
-      ) {
-        ImagePicker.showImagePicker(imagePickerOptions, (response) => {
-          console.log('Response = ', response);
-          if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
-          } else if (response.customButton) {
-            console.log('User tapped custom button: ', response.customButton);
-          } else {
-            const source = { uri: response.uri };
-            setImageSource(source);
-          }
-        });
-      }
-    });
-  };
-
-  const readXmlFile = () => {
-    var strXml = require('react-native-xml2js').parseString;
-    var xml = RecipeCategories;
-    try {
-      strXml(xml, (err, result) => {
-        setRecipeCategory(result.RecipeCategories.Category);
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const addNewIngredient = () => {
-    setIngredients([...inputIngredients, { ingredient: '', measure: '' }]);
-  };
-
-  const removeNewIngredient = (index) => {
-    const tempIngredients = [...inputIngredients];
-    tempIngredients.splice(index, 1);
-    setIngredients(tempIngredients);
-  };
-
-  const onIngredientTextChange = (index, target, value) => {
-    const tempIngredients = [...inputIngredients];
-    tempIngredients[index][target] = value;
-    setIngredients(tempIngredients);
-    console.log(inputIngredients);
-  };
-
-  const AddRecipeToDb = async () => {
-    await Realm.open({
-      schema: [RecipeSchema],
-    })
-      .then((realm) => {
-        realm.write(() => {
-          let recipeDb = realm.create(
-            'Recipe',
-            {
-              idMeal: editRecipe
-                ? recipeToEdit.idMeal
-                : UUID.v4(),
-              strMeal: recipeName,
-              strCategory: selectedPickerValue,
-              strInstructions: recipeInstruction,
-              strMealThumb: recipeImage,
-            },
-            true,
-          );
-
-          const tempIngredients = [];
-          for (let p = 0; p < 20; p++) {
-            tempIngredients.push({ ingredient: '', measure: '' });
-          }
-          for (let p = 0; p < inputIngredients.length; p++) {
-            tempIngredients[p].ingredient = inputIngredients[p].ingredient;
-            tempIngredients[p].measure = inputIngredients[p].measure;
-          }
-          for (let p = 0; p < tempIngredients.length; p++) {
-            recipeDb[`strIngredient${p + 1}`] = tempIngredients[p].ingredient;
-            recipeDb[`strMeasure${p + 1}`] = tempIngredients[p].measure;
-          }
-        });
-        {
-          for (let p of realm.objects('Recipe')) {
-            console.log(p);
-          }
-        }
-        realm.close();
-        navigation.goBack();
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  const dataBindRecipeToComponent = () => {
-    setRecipeName(recipeToEdit.strMeal);
-    changePickerValue(recipeToEdit.strCategory);
-    setImageSource(recipeToEdit.strMealThumb);
-    setRecipeInstruction(recipeToEdit.strInstructions);
-    const tempRecipeIngredients = [];
-    for (let p = 0; p < 20; p++) {
-      if (recipeToEdit['strIngredient' + `${p + 1}`] !== '' || null) {
-        tempRecipeIngredients.push({
-          ingredient: recipeToEdit[`strIngredient${p + 1}`],
-          measure: recipeToEdit[`strMeasure${p + 1}`],
-        });
-      }
-    }
-    setIngredients(tempRecipeIngredients);
-  };
+  const {
+    recipeCategoriesWithoutAll,
+    firstCategoryValueWithoutAll,
+    selectedCategory,
+  } = useSelector(({ recipeCategoriesReducer }) => recipeCategoriesReducer);
+  const {
+    recipeImage,
+    recipeName,
+    recipeInstruction,
+    recipeIngredients,
+  } = useSelector(({ recipeFormsReducer }) => recipeFormsReducer);
+  const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: editRecipe ? 'Edit Recipe' : 'Add Recipe',
+      title: editRecipe
+        ? NAVIGATION_STACK.ADD_NEW_RECIPE.title2
+        : NAVIGATION_STACK.ADD_NEW_RECIPE.title,
       headerRight: () => (
         <Button
           rounded
@@ -189,18 +79,37 @@ const AddRecipeScreen = ({ navigation, route }) => {
   }, [navigation]);
 
   useEffect(() => {
-    readXmlFile();
-    if (editRecipe) {
-      dataBindRecipeToComponent();
+    if (!editRecipe) {
+      updateSelectedCategory(firstCategoryValueWithoutAll, dispatch);
+      resetRecipeForms(dispatch);
+    } else {
+      updateSelectedCategory(recipeToEdit.strCategory, dispatch);
+      setRecipeToEdit(recipeToEdit, dispatch);
     }
   }, []);
 
   const didMountRef = useRef(false);
   useEffect(() => {
     if (didMountRef.current) {
-      AddRecipeToDb();
+      addRecipeToDb(
+        navigation,
+        recipeName,
+        selectedCategory,
+        recipeInstruction,
+        recipeImage,
+        recipeIngredients,
+        editRecipe,
+        recipeToEdit,
+      );
+      Toast.show({
+        text: editRecipe
+          ? `Edited ${recipeName} successfully!`
+          : `Added ${recipeName} successfully`,
+        buttonText: 'Okay',
+        duration: 3000,
+      });
     } else {
-      didMountRef.current = true
+      didMountRef.current = true;
     }
   }, [saved]);
 
@@ -217,7 +126,7 @@ const AddRecipeScreen = ({ navigation, route }) => {
                 style={{
                   width: '100%',
                 }}
-                onPress={() => showImagePicker()}>
+                onPress={() => showImagePicker(dispatch)}>
                 <Image
                   source={
                     recipeImage === null || recipeImage === ''
@@ -233,13 +142,12 @@ const AddRecipeScreen = ({ navigation, route }) => {
             <Label>Name</Label>
             <Input
               selectTextOnFocus
-              autoCapitalize='words'
+              autoCapitalize="words"
               numberOfLines={1}
               placeholder="ex. Garlic Bread"
               value={recipeName}
               onChangeText={(value) => {
-                setRecipeName(value);
-                console.log('Recipe Name: ' + recipeName);
+                setRecipeName(value, dispatch);
               }}
             />
           </Item>
@@ -247,12 +155,11 @@ const AddRecipeScreen = ({ navigation, route }) => {
             <Label style={{ fontSize: 15 }}>Category</Label>
             <Picker
               mode="dropdown"
-              selectedValue={selectedPickerValue}
+              selectedValue={selectedCategory}
               onValueChange={(value) => {
-                changePickerValue(value);
-                console.log('Category: ' + selectedPickerValue);
+                updateSelectedCategory(value, dispatch);
               }}>
-              {recipeCategory.map((e, i) => {
+              {recipeCategoriesWithoutAll.map((e, i) => {
                 return <Picker.Item key={i} label={e} value={e} />;
               })}
             </Picker>
@@ -267,19 +174,18 @@ const AddRecipeScreen = ({ navigation, route }) => {
               style={{ width: '100%' }}
               value={recipeInstruction}
               onChangeText={(value) => {
-                setRecipeInstruction(value);
-                console.log('Recipe Instruction: ' + recipeInstruction);
+                setRecipeInstruction(value, dispatch);
               }}
             />
           </Item>
         </Form>
         <Button
           style={{ width: '100%', justifyContent: 'center' }}
-          onPress={() => addNewIngredient()}>
+          onPress={() => addIngredient(dispatch)}>
           <Text>Add ingredient</Text>
         </Button>
         <List>
-          {inputIngredients.map((customInput, key) => {
+          {recipeIngredients.map((customInput, key) => {
             return (
               <ListItem key={key} style={{ marginLeft: 0 }}>
                 <Input
@@ -292,9 +198,9 @@ const AddRecipeScreen = ({ navigation, route }) => {
                     borderBottomWidth: 1,
                     marginEnd: 10,
                   }}
-                  value={inputIngredients[key].ingredient}
+                  value={recipeIngredients[key].ingredient}
                   onChangeText={(value) => {
-                    onIngredientTextChange(key, 'ingredient', value);
+                    onIngredientTextChange(key, 'ingredient', value, dispatch);
                   }}
                 />
                 <Input
@@ -303,19 +209,25 @@ const AddRecipeScreen = ({ navigation, route }) => {
                   numberOfLines={1}
                   placeholder="ex. 1 tbsp"
                   style={{ borderColor: 'gray', borderBottomWidth: 1 }}
-                  value={inputIngredients[key].measure}
+                  value={recipeIngredients[key].measure}
                   onChangeText={(value) =>
-                    onIngredientTextChange(key, 'measure', value)
+                    onIngredientTextChange(key, 'measure', value, dispatch)
                   }
                 />
-                <Button transparent onPress={() => addNewIngredient()}>
+                <Button
+                  transparent
+                  onPress={() => {
+                    addIngredient(dispatch);
+                  }}>
                   <Icon
                     type="FontAwesome5"
                     name="plus-circle"
                     style={{ color: 'green', marginRight: 0 }}
                   />
                 </Button>
-                <Button transparent onPress={() => removeNewIngredient(key)}>
+                <Button
+                  transparent
+                  onPress={() => removeIngredient(key, dispatch)}>
                   <Icon
                     type="FontAwesome5"
                     name="minus-circle"
