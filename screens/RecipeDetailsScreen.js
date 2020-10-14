@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Text } from 'react-native';
-import { Content, Container, Icon, Button, Toast } from 'native-base';
+import { Icon, Button, Toast } from 'native-base';
+import RecipeDetails from '../components/RecipeDetailsScreen/RecipeDetails';
 import { addRecipeToDb, checkIfRecipeExist } from '../database/RecipeDatabase';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
@@ -49,17 +49,7 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
     }
   }, []);
 
-  return (
-    <Container>
-      <Content padder>
-        {Object.values(recipe).map((e, i) => {
-          if (e !== null && e !== '') {
-            return <Text key={i}>{e}</Text>;
-          }
-        })}
-      </Content>
-    </Container>
-  );
+  return <RecipeDetails recipe={recipe} />;
 };
 
 export default RecipeDetailsScreen;
