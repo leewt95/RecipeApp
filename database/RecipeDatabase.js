@@ -42,6 +42,28 @@ export const clearDatabase = async () => {
     });
 };
 
+export const checkIfRecipeExist = (recipe, ifRecipeExist) => {
+  Realm.open({
+    schema: [RecipeSchema],
+  })
+    .then((realm) => {
+      var exist = false;
+      for (let p of realm.objects(DATABASE_RECIPE)) {
+        if (p.strMeal === recipe.strMeal) {
+          console.log(`${recipe.strMeal} already exist!`);
+          exist = true;
+          break;
+        }
+      }
+      realm.close();
+      ifRecipeExist(exist);
+    })
+    .catch((e) => {
+      console.log(e);
+      ifRecipeExist(false);
+    });
+};
+
 export const checkIfDatabaseExist = async () => {
   await RNFS.exists(`${RNFS.DocumentDirectoryPath}/default.realm`)
     .then((exists) => {
@@ -80,11 +102,6 @@ export const addRecipeToDb = async (recipe) => {
           }
         }
       });
-      {
-        for (let p of realm.objects(DATABASE_RECIPE)) {
-          console.log(p);
-        }
-      }
       realm.close();
     })
     .catch((e) => {
@@ -137,11 +154,6 @@ export const addEditRecipeToDbForms = async (
             tempIngredients[p].measure;
         }
       });
-      {
-        for (let p of realm.objects(DATABASE_RECIPE)) {
-          console.log(p);
-        }
-      }
       realm.close();
       navigation.goBack();
     })
