@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Icon, Button, Toast } from 'native-base';
+import { StyleSheet } from 'react-native';
+import { Container, Content, Icon, Button, Toast } from 'native-base';
 import RecipeDetails from '../components/RecipeDetailsScreen/RecipeDetails';
 import { addRecipeToDb, checkIfRecipeExist } from '../database/RecipeDatabase';
+import { CLR_SECONDARY } from '../constants/Colors';
 
 const RecipeDetailsScreen = ({ navigation, route }) => {
   const [saved, savedToDb] = useState(false);
@@ -13,12 +15,8 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
         headerRight: () => (
           <Button
             rounded
-            androidRippleColor="gray"
-            style={{
-              marginEnd: 3,
-              elevation: 0,
-              backgroundColor: 'transparent',
-            }}
+            androidRippleColor={CLR_SECONDARY.normal}
+            style={styles.headerBtn}
             onPress={() => {
               if (!saved) {
                 savedToDb(true);
@@ -33,7 +31,11 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
             <Icon
               type="FontAwesome5"
               name="save"
-              style={saved ? { color: 'lightgray' } : { color: 'black' }}
+              style={
+                saved
+                  ? { color: CLR_SECONDARY.dark }
+                  : { color: CLR_SECONDARY.light }
+              }
             />
           </Button>
         ),
@@ -49,7 +51,21 @@ const RecipeDetailsScreen = ({ navigation, route }) => {
     }
   }, []);
 
-  return <RecipeDetails recipe={recipe} />;
+  return (
+    <Container>
+      <Content>
+        <RecipeDetails recipe={recipe} />
+      </Content>
+    </Container>
+  );
 };
+
+const styles = StyleSheet.create({
+  headerBtn: {
+    marginEnd: 3,
+    elevation: 0,
+    backgroundColor: 'transparent',
+  },
+});
 
 export default RecipeDetailsScreen;
