@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { StatusBar } from 'react-native';
+import { Root } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import {
   createStackNavigator,
@@ -12,7 +14,7 @@ import RecipeListScreen from './screens/RecipeListScreen';
 import { Provider } from 'react-redux';
 import { recipeStore } from './reducer/RootReducer.js';
 import { NAVIGATION_STACK } from './constants/Constants';
-import { Root } from 'native-base';
+import { CLR_PRIMARY, CLR_SECONDARY } from './constants/Colors';
 
 const Stack = createStackNavigator();
 
@@ -24,11 +26,17 @@ const App = () => {
   return (
     <Provider store={recipeStore}>
       <Root>
+        <StatusBar backgroundColor={CLR_PRIMARY.dark} />
         <NavigationContainer>
           <Stack.Navigator
             initialRouteName={NAVIGATION_STACK.HOME.name}
             screenOptions={{
               ...TransitionPresets.SlideFromRightIOS,
+              headerStyle: {
+                backgroundColor: CLR_PRIMARY.normal,
+              },
+              headerTintColor: 'white',
+              headerPressColorAndroid: CLR_SECONDARY.normal,
             }}>
             <Stack.Screen
               name={NAVIGATION_STACK.HOME.name}
