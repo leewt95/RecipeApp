@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
-import { Button } from 'react-native';
-import { Container, Content } from 'native-base';
+import { StyleSheet } from 'react-native';
+import { Container, Card } from 'native-base';
 import RecipeOfTheDay from '../components/HomeScreen/RecipeOfTheDay';
-import {
-  viewDatabase,
-  clearDatabase,
-  checkIfDatabaseExist,
-} from '../database/RecipeDatabase';
-import { getRecipeOfTheDay } from '../reducer/RecipeApiReducer';
+import HomeNavButtons from '../components/HomeScreen/HomeNavButtons';
+import { checkIfDatabaseExist } from '../database/RecipeDatabase';
 import { readRecipeCategories } from '../reducer/RecipeCategoriesReducer';
 import { useDispatch } from 'react-redux';
-import { NAVIGATION_STACK } from '../constants/Constants';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -22,34 +17,22 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <Container>
-      <Content padder>
+      <Card style={styles.cardContainer}>
         <RecipeOfTheDay />
-        <Button
-          title="Get new recipe"
-          onPress={() => getRecipeOfTheDay(dispatch)}
-        />
-        <Button title="View database" onPress={() => viewDatabase()} />
-        <Button title="Clear database" onPress={() => clearDatabase()} />
-        <Button
-          title="Add custom recipe"
-          onPress={() =>
-            navigation.navigate(NAVIGATION_STACK.ADD_NEW_RECIPE.name, {
-              recipeToEdit: [],
-              editRecipe: false,
-            })
-          }
-        />
-        <Button
-          title="Recipe list"
-          onPress={() =>
-            navigation.navigate(NAVIGATION_STACK.RECIPE_LIST.name, {
-              toggleSave: false,
-            })
-          }
-        />
-      </Content>
+        <HomeNavButtons />
+      </Card>
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  cardContainer: {
+    flex: 4,
+    marginTop: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    marginRight: 0,
+  },
+});
 
 export default HomeScreen;
