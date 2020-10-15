@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Text, Image } from 'react-native';
-import { View, Card, CardItem } from 'native-base';
+import { StyleSheet, Text, Image } from 'react-native';
+import { CardItem } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import { getRecipeOfTheDay } from '../../reducer/RecipeApiReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,32 +16,56 @@ const RecipeOfTheDay = () => {
   }, []);
 
   return (
-    <View>
-      <Text>Recipe of the day</Text>
-      <Card>
-        <CardItem
-          cardBody
-          button
-          bordered
-          style={{
-            flexDirection: 'column',
-          }}
-          onPress={() =>
-            navigation.navigate(NAVIGATION_STACK.RECIPE_DETAIL.name, {
-              recipe: recipeApi,
-              toggleSave: true,
-            })
-          }>
-          <Image
-            source={{ uri: recipeApi.strMealThumb }}
-            style={{ width: '100%', height: 200 }}
-          />
-          <Text>{recipeApi.strMeal}</Text>
-        </CardItem>
-      </Card>
-      <Text>Powered by TheMealDB</Text>
-    </View>
+    <CardItem
+      cardBody
+      button
+      style={styles.cardBody}
+      onPress={() =>
+        navigation.navigate(NAVIGATION_STACK.RECIPE_DETAIL.name, {
+          recipe: recipeApi,
+          toggleSave: true,
+        })
+      }>
+      <Image
+        source={{ uri: recipeApi.strMealThumb }}
+        style={styles.cardRecipeImage}
+      />
+      <Text style={styles.cardRecipeName}>{recipeApi.strMeal}</Text>
+      <Text style={styles.cardPoweredBy}>Powered by TheMealDB</Text>
+    </CardItem>
   );
 };
+
+const styles = StyleSheet.create({
+  cardBody: {
+    flexDirection: 'row',
+    flex: 2,
+  },
+  cardRecipeImage: {
+    width: '100%',
+    height: '100%',
+    zIndex: -1,
+  },
+  cardRecipeName: {
+    position: 'absolute',
+    width: '100%',
+    color: 'white',
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: 24,
+    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  cardPoweredBy: {
+    position: 'absolute',
+    width: '100%',
+    color: 'white',
+    alignSelf: 'flex-end',
+    fontSize: 12,
+    fontStyle: 'italic',
+    padding: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+});
 
 export default RecipeOfTheDay;
