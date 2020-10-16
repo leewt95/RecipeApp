@@ -41,5 +41,17 @@ export const SET_RECIPE_INSTRUCTION = 'SET_RECIPE_INSTRUCTION';
 export const ADD_RECIPE_INGREDIENT = 'ADD_RECIPE_INGREDIENT';
 export const REMOVE_RECIPE_INGREDIENT = 'REMOVE_RECIPE_INGREDIENT';
 export const ON_INGREDIENT_TEXT_CHANGE = 'ON_INGREDIENT_TEXT_CHANGE';
+export const TARGET_INGREDIENT = 'ingredient';
+export const TARGET_MEASURE = 'measure';
 export const SET_RECIPE_TO_EDIT = 'SET_RECIPE_TO_EDIT';
 export const RESET_RECIPE_FORMS = 'RESET_RECIPE_FORMS';
+
+/*
+ * UI
+ */
+export const recipeFormExamples = {
+  name: 'ex. Garlic Bread',
+  instruction: `1. Preheat oven to 350°F\n2. Prepare the garlic bread\n3. Heat in oven for 10 min\n...`,
+  ingredient: 'ex. Bread',
+  measure: 'ex. 450g',
+};
