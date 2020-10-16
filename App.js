@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StatusBar } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { Root } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import {
@@ -31,6 +31,8 @@ const App = () => {
           <Stack.Navigator
             initialRouteName={NAVIGATION_STACK.HOME.name}
             screenOptions={{
+              // React Navigation header padding glitch during startup
+              headerStatusBarHeight: Platform.select({ android: 0 }),
               ...TransitionPresets.SlideFromRightIOS,
               headerStyle: {
                 backgroundColor: CLR_PRIMARY.normal,
