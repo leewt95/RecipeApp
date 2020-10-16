@@ -60,11 +60,16 @@ const AddEditRecipe = () => {
               onPress={() => showImagePicker(dispatch)}>
               <Image
                 source={
-                  recipeImage === null || recipeImage === ''
+                  recipeImage === ''
                     ? require('../../assets/image_placeholder_200x150.png')
                     : { uri: recipeImage }
                 }
                 style={styles.cardImage}
+              />
+              <Icon
+                type="FontAwesome5"
+                name="edit"
+                style={styles.cardIconImage}
               />
             </CardItem>
           </Card>
@@ -196,6 +201,15 @@ const styles = StyleSheet.create({
   cardImage: {
     width: '100%',
     height: 150,
+    zIndex: -1,
+  },
+  cardIconImage: {
+    position: 'absolute',
+    width: '100%',
+    alignSelf: 'flex-end',
+    color: CLR_SECONDARY.light,
+    padding: 5,
+    textAlign: 'right',
   },
   btnAddIngredient: {
     width: '100%',
