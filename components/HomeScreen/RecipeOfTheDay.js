@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, Image } from 'react-native';
-import { CardItem } from 'native-base';
+import { CardItem, Spinner } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import { getRecipeOfTheDay } from '../../reducer/RecipeApiReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { NAVIGATION_STACK } from '../../constants/Constants';
 
 const RecipeOfTheDay = () => {
-  const { recipeApi } = useSelector(({ recipeApiReducer }) => recipeApiReducer);
+  const { recipeApi, isLoading } = useSelector(
+    ({ recipeApiReducer }) => recipeApiReducer,
+  );
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
@@ -15,25 +17,29 @@ const RecipeOfTheDay = () => {
     getRecipeOfTheDay(dispatch);
   }, []);
 
-  return (
-    <CardItem
-      cardBody
-      button
-      style={styles.cardBody}
-      onPress={() =>
-        navigation.navigate(NAVIGATION_STACK.RECIPE_DETAIL.name, {
-          recipe: recipeApi,
-          toggleSave: true,
-        })
-      }>
-      <Image
-        source={{ uri: recipeApi.strMealThumb }}
-        style={styles.cardRecipeImage}
-      />
-      <Text style={styles.cardRecipeName}>{recipeApi.strMeal}</Text>
-      <Text style={styles.cardPoweredBy}>Powered by TheMealDB</Text>
-    </CardItem>
-  );
+  if (isLoading) {
+    return <Spinner style={{backgroundColor: 'black', flex: 2}} />;
+  } else {
+    return (
+      <CardItem
+        cardBody
+        button
+        style={styles.cardBody}
+        onPress={() =>
+          navigation.navigate(NAVIGATION_STACK.RECIPE_DETAIL.name, {
+            recipe: recipeApi,
+            toggleSave: true,
+          })
+        }>
+        <Image
+          source={{ uri: recipeApi.strMealThumb }}
+          style={styles.cardRecipeImage}
+        />
+        <Text style={styles.cardRecipeName}>{recipeApi.strMeal}</Text>
+        <Text style={styles.cardPoweredBy}>Powered by TheMealDB</Text>
+      </CardItem>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

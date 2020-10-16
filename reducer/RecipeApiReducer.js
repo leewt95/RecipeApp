@@ -3,6 +3,7 @@ import { API_GET_RECIPE } from '../constants/Constants';
 
 const initialState = {
   recipeApi: [],
+  isLoading: true,
 };
 
 export const getRecipeOfTheDay = async (dispatch) => {
@@ -21,6 +22,7 @@ export const RecipeAPIReducer = (state = initialState, action) => {
       return {
         ...state,
         recipeApi: action.payload,
+        isLoading: false,
       };
     default:
       return state;
