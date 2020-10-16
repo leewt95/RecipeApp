@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getRecipeOfTheDay } from '../../reducer/RecipeApiReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { NAVIGATION_STACK } from '../../constants/Constants';
+import { CLR_SECONDARY } from '../../constants/Colors';
 
 const RecipeOfTheDay = () => {
   const { recipeApi, isLoading } = useSelector(
@@ -18,7 +19,12 @@ const RecipeOfTheDay = () => {
   }, []);
 
   if (isLoading) {
-    return <Spinner style={{backgroundColor: 'black', flex: 2}} />;
+    return (
+      <Spinner
+        color={CLR_SECONDARY.light}
+        style={{ backgroundColor: 'black', flex: 2 }}
+      />
+    );
   } else {
     return (
       <CardItem
