@@ -1,8 +1,6 @@
 import React from 'react';
-import { Image } from 'react-native';
+import { StyleSheet, Image } from 'react-native';
 import {
-  Content,
-  Container,
   Form,
   Item,
   Label,
@@ -27,6 +25,12 @@ import {
   removeIngredient,
 } from '../../reducer/RecipeFormsReducer';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  recipeFormExamples,
+  TARGET_INGREDIENT,
+  TARGET_MEASURE,
+} from '../../constants/Constants';
+import { CLR_SECONDARY } from '../../constants/Colors';
 
 const AddEditRecipe = () => {
   const {
@@ -42,133 +46,179 @@ const AddEditRecipe = () => {
   const dispatch = useDispatch();
 
   return (
-    <Container>
-      <Content padder>
-        <Form>
-          <Item stackedLabel style={{ marginLeft: 0 }}>
-            <Label>Image</Label>
-            <Card style={{ marginTop: 10, marginBottom: 10 }}>
-              <CardItem
-                cardBody
-                button
-                style={{
-                  width: '100%',
+    <>
+      <Form>
+        <Item stackedLabel style={styles.itemAdjust}>
+          <Label style={styles.labelColor}>Image</Label>
+          <Card style={styles.cardBody}>
+            <CardItem
+              cardBody
+              button
+              style={{
+                width: '100%',
+              }}
+              onPress={() => showImagePicker(dispatch)}>
+              <Image
+                source={
+                  recipeImage === null || recipeImage === ''
+                    ? require('../../assets/image_placeholder_200x150.png')
+                    : { uri: recipeImage }
+                }
+                style={styles.cardImage}
+              />
+            </CardItem>
+          </Card>
+        </Item>
+        <Item stackedLabel style={styles.itemAdjust}>
+          <Label style={styles.labelColor}>Name</Label>
+          <Input
+            selectTextOnFocus
+            autoCapitalize="words"
+            numberOfLines={1}
+            placeholder={recipeFormExamples.name}
+            placeholderTextColor="lightgray"
+            value={recipeName}
+            onChangeText={(value) => {
+              setRecipeName(value, dispatch);
+            }}
+          />
+        </Item>
+        <Item style={styles.itemAdjust}>
+          <Label style={[styles.labelColor, { fontSize: 15 }]}>Category</Label>
+          <Picker
+            mode="dropdown"
+            selectedValue={selectedCategoryWithoutAll}
+            onValueChange={(value) => {
+              updateSelectedCategoryWithoutAll(value, dispatch);
+            }}>
+            {recipeCategoriesWithoutAll.map((e, i) => {
+              return <Picker.Item key={i} label={e} value={e} />;
+            })}
+          </Picker>
+        </Item>
+        <Item stackedLabel style={[styles.itemAdjust, { marginBottom: 20 }]}>
+          <Label style={styles.labelColor}>Instructions</Label>
+          <Textarea
+            selectTextOnFocus
+            autoCapitalize="sentences"
+            rowSpan={7}
+            placeholder={recipeFormExamples.instruction}
+            placeholderTextColor="lightgray"
+            style={{ width: '100%' }}
+            value={recipeInstruction}
+            onChangeText={(value) => {
+              setRecipeInstruction(value, dispatch);
+            }}
+          />
+        </Item>
+      </Form>
+      <Button
+        style={styles.btnAddIngredient}
+        onPress={() => addIngredient(dispatch)}>
+        <Text>Add ingredient</Text>
+      </Button>
+      <List>
+        {recipeIngredients.map((customInput, key) => {
+          return (
+            <ListItem key={key} style={{ marginLeft: 0 }}>
+              <Input
+                selectTextOnFocus
+                autoCapitalize="sentences"
+                numberOfLines={1}
+                placeholder={recipeFormExamples.ingredient}
+                placeholderTextColor="lightgray"
+                style={styles.inputIngredient}
+                value={recipeIngredients[key].ingredient}
+                onChangeText={(value) => {
+                  onIngredientTextChange(
+                    key,
+                    TARGET_INGREDIENT,
+                    value,
+                    dispatch,
+                  );
                 }}
-                onPress={() => showImagePicker(dispatch)}>
-                <Image
-                  source={
-                    recipeImage === null || recipeImage === ''
-                      ? require('../../assets/image_placeholder_200x150.png')
-                      : { uri: recipeImage }
-                  }
-                  style={{ width: '100%', height: 150 }}
+              />
+              <Input
+                selectTextOnFocus
+                autoCapitalize="sentences"
+                numberOfLines={1}
+                placeholder={recipeFormExamples.measure}
+                placeholderTextColor="lightgray"
+                style={styles.inputMeasure}
+                value={recipeIngredients[key].measure}
+                onChangeText={(value) =>
+                  onIngredientTextChange(key, TARGET_MEASURE, value, dispatch)
+                }
+              />
+              <Button
+                transparent
+                onPress={() => {
+                  addIngredient(dispatch);
+                }}>
+                <Icon
+                  type="FontAwesome5"
+                  name="plus-circle"
+                  style={styles.iconPlus}
                 />
-              </CardItem>
-            </Card>
-          </Item>
-          <Item stackedLabel style={{ marginLeft: 0 }}>
-            <Label>Name</Label>
-            <Input
-              selectTextOnFocus
-              autoCapitalize="words"
-              numberOfLines={1}
-              placeholder="ex. Garlic Bread"
-              value={recipeName}
-              onChangeText={(value) => {
-                setRecipeName(value, dispatch);
-              }}
-            />
-          </Item>
-          <Item style={{ marginLeft: 0 }}>
-            <Label style={{ fontSize: 15 }}>Category</Label>
-            <Picker
-              mode="dropdown"
-              selectedValue={selectedCategoryWithoutAll}
-              onValueChange={(value) => {
-                updateSelectedCategoryWithoutAll(value, dispatch);
-              }}>
-              {recipeCategoriesWithoutAll.map((e, i) => {
-                return <Picker.Item key={i} label={e} value={e} />;
-              })}
-            </Picker>
-          </Item>
-          <Item stackedLabel style={{ marginLeft: 0, marginBottom: 20 }}>
-            <Label>Instructions</Label>
-            <Textarea
-              selectTextOnFocus
-              autoCapitalize="sentences"
-              rowSpan={5}
-              placeholder="1. ...."
-              style={{ width: '100%' }}
-              value={recipeInstruction}
-              onChangeText={(value) => {
-                setRecipeInstruction(value, dispatch);
-              }}
-            />
-          </Item>
-        </Form>
-        <Button
-          style={{ width: '100%', justifyContent: 'center' }}
-          onPress={() => addIngredient(dispatch)}>
-          <Text>Add ingredient</Text>
-        </Button>
-        <List>
-          {recipeIngredients.map((customInput, key) => {
-            return (
-              <ListItem key={key} style={{ marginLeft: 0 }}>
-                <Input
-                  selectTextOnFocus
-                  autoCapitalize="sentences"
-                  numberOfLines={1}
-                  placeholder="ex. Garlic"
-                  style={{
-                    borderColor: 'gray',
-                    borderBottomWidth: 1,
-                    marginEnd: 10,
-                  }}
-                  value={recipeIngredients[key].ingredient}
-                  onChangeText={(value) => {
-                    onIngredientTextChange(key, 'ingredient', value, dispatch);
-                  }}
+              </Button>
+              <Button
+                transparent
+                onPress={() => removeIngredient(key, dispatch)}>
+                <Icon
+                  type="FontAwesome5"
+                  name="minus-circle"
+                  style={styles.iconMinus}
                 />
-                <Input
-                  selectTextOnFocus
-                  autoCapitalize="sentences"
-                  numberOfLines={1}
-                  placeholder="ex. 1 tbsp"
-                  style={{ borderColor: 'gray', borderBottomWidth: 1 }}
-                  value={recipeIngredients[key].measure}
-                  onChangeText={(value) =>
-                    onIngredientTextChange(key, 'measure', value, dispatch)
-                  }
-                />
-                <Button
-                  transparent
-                  onPress={() => {
-                    addIngredient(dispatch);
-                  }}>
-                  <Icon
-                    type="FontAwesome5"
-                    name="plus-circle"
-                    style={{ color: 'green', marginRight: 0 }}
-                  />
-                </Button>
-                <Button
-                  transparent
-                  onPress={() => removeIngredient(key, dispatch)}>
-                  <Icon
-                    type="FontAwesome5"
-                    name="minus-circle"
-                    style={{ color: 'red', marginRight: 0 }}
-                  />
-                </Button>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Content>
-    </Container>
+              </Button>
+            </ListItem>
+          );
+        })}
+      </List>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  itemAdjust: {
+    marginLeft: 0,
+    borderBottomColor: CLR_SECONDARY.dark,
+    borderBottomWidth: 1,
+  },
+  labelColor: {
+    color: CLR_SECONDARY.normal,
+    textShadowColor: 'black',
+    textShadowRadius: 1,
+  },
+  cardBody: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  cardImage: {
+    width: '100%',
+    height: 150,
+  },
+  btnAddIngredient: {
+    width: '100%',
+    justifyContent: 'center',
+    backgroundColor: CLR_SECONDARY.normal,
+  },
+  inputIngredient: {
+    borderColor: CLR_SECONDARY.dark,
+    borderBottomWidth: 1,
+    marginEnd: 10,
+  },
+  inputMeasure: {
+    borderColor: CLR_SECONDARY.dark,
+    borderBottomWidth: 1,
+  },
+  iconPlus: {
+    color: 'green',
+    marginRight: 0,
+  },
+  iconMinus: {
+    color: 'red',
+    marginRight: 0,
+  },
+});
 
 export default AddEditRecipe;

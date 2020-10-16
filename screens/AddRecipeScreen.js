@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useLayoutEffect, useRef } from 'react';
-import { Button, Icon, Toast } from 'native-base';
+import { StyleSheet } from 'react-native';
+import { Container, Content, Button, Icon, Toast } from 'native-base';
 import AddEditRecipe from '../components/AddRecipeScreen/AddEditRecipe';
-import { NAVIGATION_STACK } from '../constants/Constants';
 import { addEditRecipeToDbForms } from '../database/RecipeDatabase';
 import { updateSelectedCategoryWithoutAll } from '../reducer/RecipeCategoriesReducer';
 import {
@@ -9,6 +9,8 @@ import {
   resetRecipeForms,
 } from '../reducer/RecipeFormsReducer';
 import { useDispatch, useSelector } from 'react-redux';
+import { NAVIGATION_STACK } from '../constants/Constants';
+import { CLR_SECONDARY } from '../constants/Colors';
 
 const AddRecipeScreen = ({ navigation, route }) => {
   const { recipeToEdit, editRecipe } = route.params;
@@ -34,11 +36,7 @@ const AddRecipeScreen = ({ navigation, route }) => {
         <Button
           rounded
           androidRippleColor="gray"
-          style={{
-            marginEnd: 3,
-            elevation: 0,
-            backgroundColor: 'transparent',
-          }}
+          style={styles.headerBtn}
           onPress={() => {
             if (!saved) {
               savedToDb(true);
@@ -47,7 +45,11 @@ const AddRecipeScreen = ({ navigation, route }) => {
           <Icon
             type="FontAwesome5"
             name="save"
-            style={saved ? { color: 'lightgray' } : { color: 'black' }}
+            style={
+              saved
+                ? { color: CLR_SECONDARY.dark }
+                : { color: CLR_SECONDARY.light }
+            }
           />
         </Button>
       ),
@@ -89,7 +91,21 @@ const AddRecipeScreen = ({ navigation, route }) => {
     }
   }, [saved]);
 
-  return <AddEditRecipe />;
+  return (
+    <Container>
+      <Content style={{ paddingHorizontal: 10 }}>
+        <AddEditRecipe />
+      </Content>
+    </Container>
+  );
 };
+
+const styles = StyleSheet.create({
+  headerBtn: {
+    marginEnd: 3,
+    elevation: 0,
+    backgroundColor: 'transparent',
+  },
+});
 
 export default AddRecipeScreen;
