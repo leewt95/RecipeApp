@@ -14,6 +14,7 @@ import {
   Button,
   Icon,
   Text,
+  Body,
 } from 'native-base';
 import { updateSelectedCategoryWithoutAll } from '../../reducer/RecipeCategoriesReducer';
 import {
@@ -88,10 +89,14 @@ const AddEditRecipe = () => {
             }}
           />
         </Item>
-        <Item style={styles.itemAdjust}>
-          <Label style={[styles.labelColor, { fontSize: 15 }]}>Category</Label>
+        <Body style={[styles.itemAdjust, { flexDirection: 'row' }]}>
+          <Label
+            style={[styles.labelColor, { fontSize: 15, alignSelf: 'center' }]}>
+            Category
+          </Label>
           <Picker
             mode="dropdown"
+            style={{marginTop: 3}}
             selectedValue={selectedCategoryWithoutAll}
             onValueChange={(value) => {
               updateSelectedCategoryWithoutAll(value, dispatch);
@@ -100,7 +105,7 @@ const AddEditRecipe = () => {
               return <Picker.Item key={i} label={e} value={e} />;
             })}
           </Picker>
-        </Item>
+        </Body>
         <Item stackedLabel style={[styles.itemAdjust, { marginBottom: 20 }]}>
           <Label style={styles.labelColor}>Instructions</Label>
           <Textarea
