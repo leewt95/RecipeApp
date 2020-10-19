@@ -31,7 +31,14 @@ const RecipeDetails = ({ recipe }) => {
 
   return (
     <Form>
-      <Image source={{ uri: recipe.strMealThumb }} style={styles.image} />
+      <Image
+        source={
+          recipe.strMealThumb === ''
+            ? require('../../assets/image_placeholder_200x150.png')
+            : { uri: recipe.strMealThumb }
+        }
+        style={styles.image}
+      />
       <View style={styles.formMargin}>
         <Item inlineLabel style={styles.itemMargin}>
           <Label style={[styles.itemContentMargin, styles.labelColor]}>
@@ -49,7 +56,9 @@ const RecipeDetails = ({ recipe }) => {
           <Label style={[styles.labelAdjust, styles.labelColor]}>
             Instructions
           </Label>
-          <Text style={styles.itemContentMargin}>{recipe.strInstructions}</Text>
+          <Text style={(styles.itemContentMargin, { alignSelf: 'flex-start' })}>
+            {recipe.strInstructions}
+          </Text>
         </Item>
         <Item inlineLabel style={[styles.itemMargin, styles.itemFlexDir]}>
           <Label style={[styles.labelAdjust, styles.labelColor]}>
